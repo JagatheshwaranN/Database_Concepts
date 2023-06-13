@@ -12,10 +12,8 @@ public class CreateTable {
         Class.forName("oracle.jdbc.driver.OracleDriver");
         Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/XEPDB1", "JAGA", "ALLOWME");
         Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery("Select * from Employee");
-        while (rs.next()) {
-            System.out.println(rs.getInt(1) + "		" + rs.getString(2) + "		" + rs.getInt(3) + "	 " + rs.getInt(4));
-        }
+        st.executeUpdate("Create Table Groceries(Grcs_No number(4,0), Grcs_Name varchar2(20), Grcs_Qty varchar2(10), Grcs_Price number(7,2))");
+        System.out.println("Groceries Table created.");
         conn.close();
     }
 }
