@@ -14,8 +14,8 @@ public class InsertRecord {
             Statement statement = connection.createStatement();
             int updateCount = statement.executeUpdate("Insert Into Groceries (Grcs_No, Grcs_Name, Grcs_Qty, Grcs_Price) values(101, 'Noodles', '2No', 150)");
             System.out.println("Number of rows created : "+updateCount);
-        } catch (SQLException sqe) {
-            throw new RuntimeException(sqe);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
 
     }

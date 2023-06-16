@@ -17,8 +17,8 @@ public class VerifyTableCreated {
             while (resultSet.next()) {
                 System.out.println(resultSet.getString(1) + " | " + resultSet.getString(2) + " | " + resultSet.getInt(3) + " | " + resultSet.getString(4));
             }
-        }catch(SQLException sqe){
-            sqe.printStackTrace();
+        }catch(SQLException sqlException){
+            sqlException.printStackTrace();
         }
     }
 }

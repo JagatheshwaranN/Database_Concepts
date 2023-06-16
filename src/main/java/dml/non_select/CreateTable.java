@@ -14,8 +14,8 @@ public class CreateTable {
             Statement statement = connection.createStatement();
             statement.executeUpdate("Create Table Groceries(Grcs_No number(4,0), Grcs_Name varchar2(20), Grcs_Qty varchar2(10), Grcs_Price number(7,2))");
             System.out.println("Groceries Table created.");
-        }catch (SQLException sqe){
-            sqe.printStackTrace();
+        }catch (SQLException sqlException){
+            sqlException.printStackTrace();
         }
     }
 }

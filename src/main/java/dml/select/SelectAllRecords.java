@@ -13,8 +13,8 @@ public class SelectAllRecords {
             while (resultSet.next()) {
                 System.out.println(resultSet.getInt(1) + " | " + resultSet.getString(2) + " | " + resultSet.getString(3) + " | " + resultSet.getInt(4));
             }
-        } catch (SQLException sqe) {
-            throw new RuntimeException(sqe);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }

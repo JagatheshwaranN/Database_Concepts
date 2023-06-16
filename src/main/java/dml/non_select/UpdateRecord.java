@@ -14,8 +14,8 @@ public class UpdateRecord {
             Statement statement = connection.createStatement();
             int updateCount = statement.executeUpdate("Update Groceries Set Grcs_No = 101 where Grcs_Name = 'Cookies'");
             System.out.println("Number of rows updated : "+updateCount);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }
