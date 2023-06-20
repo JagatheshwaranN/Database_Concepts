@@ -17,6 +17,5 @@ public class _02_InsertRecord {
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
         }
-
     }
 }

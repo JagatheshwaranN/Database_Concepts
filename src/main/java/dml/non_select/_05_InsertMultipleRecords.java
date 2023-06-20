@@ -36,7 +36,6 @@ public class _05_InsertMultipleRecords {
             System.out.println("Number of rows created : "+counter);
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
-        } ;
-
+        }
     }
 }
