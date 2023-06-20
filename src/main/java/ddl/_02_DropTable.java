@@ -26,8 +26,8 @@ public class _02_DropTable {
             Statement statement = connection.createStatement();
             statement.executeUpdate("Create Table Person(Name varchar2(20), Age number(3), City Varchar2(20))");
             System.out.println("Person Table created.");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }

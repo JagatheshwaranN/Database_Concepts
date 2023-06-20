@@ -14,8 +14,8 @@ public class _06_DeleteAllRecords {
             Statement statement = connection.createStatement();
             int updateCount = statement.executeUpdate("Delete Groceries");
             System.out.println("Number of rows deleted : "+updateCount);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }

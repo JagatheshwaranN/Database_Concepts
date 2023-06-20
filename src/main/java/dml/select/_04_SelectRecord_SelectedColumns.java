@@ -13,8 +13,8 @@ public class _04_SelectRecord_SelectedColumns {
             while(resultSet.next()){
                 System.out.println(resultSet.getInt(1)+" | "+resultSet.getString(2));
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }

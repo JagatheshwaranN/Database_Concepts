@@ -14,8 +14,8 @@ public class _01_TruncateTable {
             Statement statement = connection.createStatement();
             statement.executeUpdate("Truncate Table Groceries");
             System.out.println("Groceries Table truncated");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
         }
     }
 }
