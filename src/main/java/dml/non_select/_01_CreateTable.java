@@ -2,11 +2,10 @@ package dml.non_select;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CreateTable {
+public class _01_CreateTable {
     public static void main(String[] args) throws ClassNotFoundException {
 
         Class.forName("oracle.jdbc.driver.OracleDriver"); // From JDBC 4.2v, this line is optional

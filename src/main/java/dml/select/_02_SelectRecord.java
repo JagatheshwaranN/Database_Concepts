@@ -2,7 +2,7 @@ package dml.select;
 
 import java.sql.*;
 
-public class SelectRecord {
+public class _02_SelectRecord {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
