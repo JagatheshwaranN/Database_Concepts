@@ -1,4 +1,4 @@
-package dml.select;
+package dml.select.general;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

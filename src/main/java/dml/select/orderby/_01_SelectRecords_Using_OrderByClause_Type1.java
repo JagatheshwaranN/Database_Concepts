@@ -1,8 +1,8 @@
-package dml.select;
+package dml.select.orderby;
 
 import java.sql.*;
 
-public class _08_SelectRecords_Using_OrderByClause_Type1 {
+public class _01_SelectRecords_Using_OrderByClause_Type1 {
 
     public static void main(String[] args) throws ClassNotFoundException {
 

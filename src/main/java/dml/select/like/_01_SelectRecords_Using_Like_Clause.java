@@ -1,8 +1,8 @@
-package dml.select;
+package dml.select.like;
 
 import java.sql.*;
 
-public class _15_SelectRecords_Using_Like_Clause {
+public class _01_SelectRecords_Using_Like_Clause {
     static ResultSet resultSet;
     public static void main(String[] args) throws ClassNotFoundException {
 

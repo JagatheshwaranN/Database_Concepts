@@ -1,18 +1,17 @@
-package dml.select;
+package dml.select.distinct;
 
 import java.sql.*;
 
-public class _11_SelectRecords_Using_Relational_Ops_OrderBy_Type2 {
+public class _02_SelectDistinctRecord_SelectedColumn {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
         Class.forName("oracle.jdbc.driver.OracleDriver");
         try(Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/XEPDB1", "JAGA", "ALLOWME")){
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("Select * from Emp where Sal <= 40000 order by Sal");
-            while (resultSet.next()){
-                System.out.println(resultSet.getInt(1)+" | "+resultSet.getString(2)+" | "+
-                        resultSet.getInt(3) + " | "+resultSet.getString(4));
+            ResultSet resultSet = statement.executeQuery("Select Distinct Designation From Emp");
+            while(resultSet.next()){
+                System.out.println(resultSet.getString(1));
             }
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);

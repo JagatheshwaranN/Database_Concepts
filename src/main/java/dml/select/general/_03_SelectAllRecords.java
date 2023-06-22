@@ -1,15 +1,15 @@
-package dml.select;
+package dml.select.general;
 
 import java.sql.*;
 
-public class _02_SelectRecord {
+public class _03_SelectAllRecords {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
         Class.forName("oracle.jdbc.driver.OracleDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/XEPDB1", "JAGA", "ALLOWME")) {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("Select * From Groceries Where Grcs_No = 101");
+            ResultSet resultSet = statement.executeQuery("Select * From Groceries");
             while (resultSet.next()) {
                 System.out.println(resultSet.getInt(1) + " | " + resultSet.getString(2) + " | " + resultSet.getString(3) + " | " + resultSet.getInt(4));
             }
