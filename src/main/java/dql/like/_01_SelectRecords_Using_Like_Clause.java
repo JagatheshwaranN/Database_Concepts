@@ -21,7 +21,19 @@ public class _01_SelectRecords_Using_Like_Clause {
                         resultSet.getInt(3) + " | "+resultSet.getString(4));
             }
             System.out.println("=====================================");
+            resultSet = statement.executeQuery("Select * from Emp where Ename Like '%e'");
+            while (resultSet.next()){
+                System.out.println(resultSet.getInt(1)+" | "+resultSet.getString(2)+" | "+
+                        resultSet.getInt(3) + " | "+resultSet.getString(4));
+            }
+            System.out.println("=====================================");
             resultSet = statement.executeQuery("Select * from Emp where Ename Like '____'");
+            while (resultSet.next()){
+                System.out.println(resultSet.getInt(1)+" | "+resultSet.getString(2)+" | "+
+                        resultSet.getInt(3) + " | "+resultSet.getString(4));
+            }
+            System.out.println("=====================================");
+            resultSet = statement.executeQuery("Select * from Emp where Sal Like '4__0%'");
             while (resultSet.next()){
                 System.out.println(resultSet.getInt(1)+" | "+resultSet.getString(2)+" | "+
                         resultSet.getInt(3) + " | "+resultSet.getString(4));
