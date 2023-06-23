@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class _05_InsertMultipleRecords {
+public class _04_InsertMultipleRecords {
 
     public static void main(String[] args) throws ClassNotFoundException {
 

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _03_UpdateRecord {
+public class _02_UpdateRecord {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
