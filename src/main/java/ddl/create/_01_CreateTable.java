@@ -1,4 +1,4 @@
-package ddl;
+package ddl.create;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

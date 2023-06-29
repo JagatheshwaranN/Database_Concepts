@@ -1,11 +1,11 @@
-package ddl;
+package ddl.alter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _02_AlterTable {
+public class _01_AlterTable {
 
     static Statement statement;
 

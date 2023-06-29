@@ -1,11 +1,11 @@
-package ddl;
+package ddl.truncate;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _03_TruncateTable {
+public class _01_TruncateTable {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
