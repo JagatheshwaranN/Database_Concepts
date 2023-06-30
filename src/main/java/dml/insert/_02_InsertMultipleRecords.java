@@ -1,4 +1,4 @@
-package dml;
+package dml.insert;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class _04_InsertMultipleRecords {
+public class _02_InsertMultipleRecords {
 
     public static void main(String[] args) throws ClassNotFoundException {
 

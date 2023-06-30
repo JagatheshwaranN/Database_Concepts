@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _02_InsertRecord_Into_View {
+public class _03_InsertRecord_Into_View {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
