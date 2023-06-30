@@ -1,19 +1,20 @@
-package dml;
+package ddl.create;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSet;
 
-public class _02_UpdateRecord {
+public class _03_CreateView {
 
     public static void main(String[] args) throws ClassNotFoundException {
 
         Class.forName("oracle.jdbc.driver.OracleDriver");
         try(Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/XEPDB1", "JAGA", "ALLOWME")){
             Statement statement = connection.createStatement();
-            int updateCount = statement.executeUpdate("Update Groceries Set Grcs_No = 101 where Grcs_Name = 'Cookies'");
-            System.out.println("Number of rows updated : "+updateCount);
+            statement.executeUpdate("Create View Vw_Groceries As Select * From Groceries");
+            System.out.println("Groceries View created.");
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
         }
