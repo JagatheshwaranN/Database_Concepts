@@ -20,5 +20,14 @@ public class _06_CreateView_Force {
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException);
         }
+        finally {
+            try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/XEPDB1", "JAGA", "ALLOWME")) {
+                Statement statement = connection.createStatement();
+                statement.executeUpdate("Drop View Vw_Cars");
+                System.out.println("Vw_Cars View dropped.");
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        }
     }
 }
