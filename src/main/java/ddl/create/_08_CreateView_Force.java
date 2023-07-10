@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _06_CreateView_Force {
+public class _08_CreateView_Force {
 
     /*
         Force View - The view created forcefully without the existence of the table.

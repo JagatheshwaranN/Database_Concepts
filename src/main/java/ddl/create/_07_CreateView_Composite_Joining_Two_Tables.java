@@ -2,7 +2,7 @@ package ddl.create;
 
 import java.sql.*;
 
-public class _05_CreateView_Composite_Joining_Two_Tables {
+public class _07_CreateView_Composite_Joining_Two_Tables {
 
     public static void main(String[] args) throws ClassNotFoundException {
 

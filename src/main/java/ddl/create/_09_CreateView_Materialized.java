@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class _06_CreateView_Materialized {
+public class _09_CreateView_Materialized {
 
     /*
         Materialized View - The materialized view is like a snapshot of the table data. While
