@@ -1,0 +1,155 @@
+Questions
+=========
+DDL -> CREATE, ALTER, DROP, TRUNCATE, COMMENT, RENAME, and GRANT
+DML -> INSERT, UPDATE, DELETE, and MERGE
+TCL -> COMMIT, ROLLBACK, SAVEPOINT, SET TRANSACTION, and AUTOCOMMIT
+
+1. What is DML, and what are its types in Oracle?
+DML stands for Data Manipulation Language. It is used to manipulate data in the database. In Oracle, DML
+includes commands like INSERT, UPDATE, DELETE, and MERGE.
+
+2. Explain the difference between DDL and DML in Oracle.
+1. DDL (Data Definition Language) is used to define and manage the structure of database objects like tables,
+indexes, views, etc. Examples of DDL commands include CREATE, ALTER, DROP, TRUNCATE, etc.
+
+2. DML (Data Manipulation Language), on the other hand, is used to manipulate data stored in the database.
+Examples of DML commands include INSERT, UPDATE, DELETE, MERGE, etc.
+
+3. What is TCL, and what are its types in Oracle?
+TCL stands for Transaction Control Language. It is a category of SQL commands that deal with transactions
+within a database. In Oracle, TCL commands primarily include COMMIT, ROLLBACK, SAVEPOINT, SET TRANSACTION,
+and AUTOCOMMIT.
+
+4. Differentiate between DELETE and TRUNCATE in Oracle.
+DELETE is a DML command that removes specific rows from a table based on a condition, and it can be rolled
+back using a ROLLBACK statement. TRUNCATE is a DDL command that removes all rows from a table and releases
+the storage space, and it cannot be rolled back.
+
+5. Explain the COMMIT and ROLLBACK statements in Oracle.
+1. COMMIT is a TCL command used to permanently save any changes made during the current transaction. Once a
+COMMIT statement is executed, the changes become permanent in the database.
+
+2. ROLLBACK, on the other hand, is a TCL command that reverts any changes made during the current transaction
+back to the last COMMIT point  or the beginning of the transaction if no COMMIT has been issued.
+
+6. What is the purpose of the SAVEPOINT statement in Oracle?
+SAVEPOINT is a TCL command used to define a point within a transaction to which you can later roll back. It
+allows you to partially roll back a transaction instead of rolling back the entire transaction.
+
+7. Explain the CASCADE CONSTRAINTS option in Oracle when dropping a table.
+CASCADE CONSTRAINTS is an option used with the DROP TABLE statement in Oracle. When CASCADE CONSTRAINTS is
+specified, it will automatically drop all the referential integrity constraints (foreign key constraints)
+that refer to the primary or unique key columns of the table being dropped.
+
+8. What is SET TRANSACTION in TCL?
+SET TRANSACTION is used to specify properties for a transaction, such as isolation level, access mode, and
+transaction name. It allows you to control various aspects of how transactions are processed by the database.
+
+9. What is AUTOCOMMIT in TCL?
+AUTOCOMMIT is a mode that can be enabled or disabled in Oracle. When AUTOCOMMIT is enabled, each individual
+SQL statement is treated as a separate transaction, and it is automatically committed after execution. When
+AUTOCOMMIT is disabled, you need to explicitly issue a COMMIT or ROLLBACK command to end the transaction.
+
+10. Explain the difference between UPDATE and MERGE statements.
+Both modify existing data, but UPDATE edits specific rows based on a WHERE clause, while MERGE can perform
+INSERT, UPDATE, or DELETE based on a matched condition. MERGE is generally more concise for complex operations.
+
+11. Write a query to create a table named Customers with columns for customer_id (number), customer_name
+(varchar2), and city (varchar2)?
+CREATE TABLE Customers (
+  customer_id NUMBER PRIMARY KEY,
+  customer_name VARCHAR2(50) NOT NULL,
+  city VARCHAR2(30)
+);
+
+12. Describe the concept of constraints in Oracle and their types.
+Constraints enforce data integrity within tables. Common types include:
+1. PRIMARY KEY: Ensures unique values in a column or set of columns.
+2. FOREIGN KEY: Creates a link between two tables, referencing a PRIMARY KEY in another table.
+2. NOT NULL: Prevents null values in a column.
+
+13. Explain the concept of ACID properties in transactions.
+ACID stands for below,
+Atomicity: Transactions are indivisible units of work, either all succeed or all fail.
+Consistency: Transactions maintain data integrity by following defined rules.
+Isolation: Transactions are isolated from each other, preventing interference.
+Durability: Once committed, changes made by a transaction are permanent.
+
+14. What is a subquery?
+A subquery is a query nested within another query. It is enclosed within parentheses and can be used in
+various parts of a SQL statement, such as the WHERE clause, FROM clause, SELECT clause, or HAVING clause.
+
+15. What are the types of subqueries in Oracle SQL?
+1. Single-row subquery: A subquery that returns only one row and one column.
+2. Multi-row subquery: A subquery that returns multiple rows but only one column.
+
+16. What is the difference between a correlated and a non-correlated subquery?
+1. Non-correlated subquery: A subquery that can be executed independently of the outer query and does not
+reference columns from the outer query.
+2. Correlated subquery: A subquery that depends on the outer query and references columns from the outer
+query.
+
+17. How can you use a subquery in the WHERE clause?
+You can use a subquery in the WHERE clause to filter rows based on the result of the subquery.
+For example:
+SELECT column1 FROM table1 WHERE column2 = (SELECT column3 FROM table2 WHERE condition);
+
+18. What is the result of a subquery that returns NULL values?
+If a subquery returns NULL values, it is treated as if it returned an empty set. For example, if a subquery
+in the WHERE clause does not match any rows, the outer query will not return any rows.
+
+19. When would you use a subquery instead of a join?
+Subqueries are often used when the result set of the inner query is dynamic and depends on the data in the
+database or when the query logic is more straightforward to express using a subquery. Joins are typically
+used when joining tables based on common columns.
+
+20. What is the EXISTS and IN operators, and how is it used with subqueries?
+The EXISTS operator is used to test for the existence of rows returned by a subquery. It returns TRUE if
+the subquery returns at least one row; otherwise, it returns FALSE. The EXISTS operator is commonly used
+in correlated subqueries.
+SELECT column1 FROM table1 WHERE EXISTS (SELECT * FROM table2 WHERE condition);
+
+The IN operator is used to filters rows in the outer query based on whether their values are present in
+the subquery result set.
+SELECT column1 FROM table1 WHERE IN (SELECT * FROM table2 WHERE condition);
+
+21. Write a query to find all employees who earn more than the average salary in the company.
+SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);
+
+22. Find the name of the department with the highest number of employees.
+SELECT department_name FROM departments WHERE number_of_employees = (SELECT MAX(number_of_employees)
+FROM departments);
+
+23. Identify customers who haven't placed any orders in the last 6 months.
+SELECT * FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o
+WHERE o.customer_id = c.customer_id AND order_date > SYSDATE - 180);
+
+24. What is a join in Oracle SQL?
+A join is a SQL operation used to combine rows from two or more tables based on a related column
+between them.
+
+25. What are the different types of joins in Oracle SQL?
+1. INNER JOIN: Returns rows when there is at least one match in both tables.
+2. LEFT JOIN (or LEFT OUTER JOIN): Returns all rows from the left table and the matched rows from the
+right table. If there is no match, NULL values are returned for the columns from the right table.
+3. RIGHT JOIN (or RIGHT OUTER JOIN): Returns all rows from the right table and the matched rows from
+the left table. If there is no match, NULL values are returned for the columns from the left table.
+4. FULL JOIN (or FULL OUTER JOIN): Returns all rows when there is a match in either table. It combines
+the results of both LEFT JOIN and RIGHT JOIN.
+5. CROSS JOIN: Returns the Cartesian product of the two tables, i.e., all possible combinations of rows.
+
+26. What is the difference between INNER JOIN and OUTER JOIN?
+1. INNER JOIN returns only the rows where there is a match in both tables.
+2. OUTER JOIN returns all rows from one or both tables, depending on the type of outer join, and includes
+unmatched rows with NULL values.
+
+27. What is a self-join, and how is it used?
+A self-join is a join in which a table is joined with itself. It is often used to compare rows within
+the same table or to find hierarchical relationships within the table.
+
+28. What is the difference between a join condition specified in the WHERE clause and the ON clause?
+1. The join condition specified in the WHERE clause is used for implicit joins, where tables are listed with
+commas in the FROM clause.
+2. The ON clause is used for explicit joins (ANSI SQL syntax) and specifies the join condition directly after
+the JOIN keyword.
+
