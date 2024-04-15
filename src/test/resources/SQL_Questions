@@ -129,14 +129,178 @@ A join is a SQL operation used to combine rows from two or more tables based on 
 between them.
 
 25. What are the different types of joins in Oracle SQL?
-1. INNER JOIN: Returns rows when there is at least one match in both tables.
-2. LEFT JOIN (or LEFT OUTER JOIN): Returns all rows from the left table and the matched rows from the
-right table. If there is no match, NULL values are returned for the columns from the right table.
-3. RIGHT JOIN (or RIGHT OUTER JOIN): Returns all rows from the right table and the matched rows from
-the left table. If there is no match, NULL values are returned for the columns from the left table.
-4. FULL JOIN (or FULL OUTER JOIN): Returns all rows when there is a match in either table. It combines
-the results of both LEFT JOIN and RIGHT JOIN.
-5. CROSS JOIN: Returns the Cartesian product of the two tables, i.e., all possible combinations of rows.
+1. Inner Joins (Simple Join)
+2. Left Outer Join (Left Join)
+3. Right Outer Join (Right Join)
+4. Full Outer Join (Full Join)
+5. Equijoins
+6. Self Joins
+7. Cross Joins (Cartesian Products)
+8. Antijoins
+9. Semijoins
+
+26. What is Inner Join?
+Inner Join is the simplest and most common type of join. It is also known as simple join. It returns
+all rows from multiple tables where the join condition is met.
+
+Suppliers Table
+===============
+Supplier Id     Supplier Name           Supplier Address
+-------------------------------------------------------
+1               Bata Shoes              Agra
+2               Walkaro Slippers        Delhi
+3               Bombay Dying Shocks     Mumbai
+
+Orders Table
+============
+order Num       Supplier Id         City
+-----------------------------------------
+101             1                   Allahabad
+102             2                   Kanpur
+
+SELECT columns FROM table1 INNER JOIN table2 ON table1.column = table2.column;
+
+SELECT suppliers.supplier_id, suppliers.supplier_name, orders.order_number
+FROM suppliers INNER JOIN orders
+ON suppliers.supplier_id = orders.supplier_id;
+
+Output
+======
+supplier_id   | supplier_name        | order_number
+---------------------------------------------------
+1             | Bata Shoes           | 101
+2             | Walkaro Slippers     | 102
+
+Explanation:
+============
+Supplier ID 1 ("Bata Shoes") has an order associated with it, which is Order Number 101.
+Supplier ID 2 ("Walkaro Slippers") has an order associated with it, which is Order Number 102.
+Supplier ID 3 ("Bombay Dying Shocks") does not have any orders associated with it, so it does not appear
+in the result set.
+
+27. What is Left Outer Join / Left Join?
+Left Outer Join returns all rows from the left (first) table specified in the ON condition and only
+those rows from the right (second) table where the join condition is met.
+
+Suppliers Table
+===============
+Supplier Id     Supplier Name           Supplier Address
+-------------------------------------------------------
+1               Bata Shoes              Agra
+2               Walkaro Slippers        Delhi
+3               Bombay Dying Shocks     Mumbai
+
+Orders Table
+============
+order Num       Supplier Id         City
+-----------------------------------------
+101             1                   Allahabad
+102             2                   Kanpur
+
+SELECT columns  FROM table1 LEFT [OUTER] JOIN table2 ON table1.column = table2.column;
+
+SELECT suppliers.supplier_id, suppliers.supplier_name, orders.order_number
+FROM suppliers LEFT [OUTER] JOIN order
+ON suppliers.supplier_id = orders.supplier_id;
+
+Output
+======
+supplier_id   | supplier_name        | order_number
+---------------------------------------------------
+1             | Bata Shoes           | 101
+2             | Walkaro Slippers     | 102
+3             | Bombay Dying Shocks  | NULL
+
+Explanation:
+============
+Supplier ID 1 ("Bata Shoes") has an order associated with it, which is Order Number 101.
+Supplier ID 2 ("Walkaro Slippers") has an order associated with it, which is Order Number 102.
+Supplier ID 3 ("Bombay Dying Shocks") does not have any orders associated with it, so the order number
+column shows NULL for this supplier.
+
+28. What is Right Outer Join / Right Join?
+The Right Outer Join returns all rows from the right-hand table specified in the ON condition and only
+those rows from the other table where the join condition is met.
+
+Suppliers Table
+===============
+Supplier Id     Supplier Name           Supplier Address
+-------------------------------------------------------
+1               Bata Shoes              Agra
+2               Walkaro Slippers        Delhi
+3               Bombay Dying Shocks     Mumbai
+
+Orders Table
+============
+order Num       Supplier Id         City
+-----------------------------------------
+101             1                   Allahabad
+102             2                   Kanpur
+
+SELECT columns FROM table1 RIGHT [OUTER] JOIN table2 ON table1.column = table2.column;
+
+SELECT orders.order_number, orders.city, suppliers.supplier_name
+FROM suppliers RIGHT OUTER JOIN orders
+ON orders.supplier_id = suppliers.supplier_id;
+
+Output
+======
+order_num   | city       | supplier_name
+-----------------------------------------
+101         | Allahabad  | Bata Shoes
+102         | Kanpur     | Walkaro Slippers
+
+Explanation:
+============
+Order 101 is associated with Supplier ID 1, which corresponds to "Bata Shoes" in the suppliers table.
+Order 102 is associated with Supplier ID 2, which corresponds to "Walkaro Slippers" in the suppliers table.
+Since there are no orders associated with Supplier ID 3, the supplier information for Supplier ID 3 ("Bombay
+Dying Shocks") will not appear in the output, resulting in NULL values for supplier_name in those rows.
+
+29. What is Full Outer Join / Full Join?
+The Full Outer Join returns all rows from the left hand table and right hand table. It places NULL
+where the join condition is not met.
+
+Suppliers Table
+===============
+Supplier Id     Supplier Name           Supplier Address
+-------------------------------------------------------
+1               Bata Shoes              Agra
+2               Walkaro Slippers        Delhi
+3               Bombay Dying Shocks     Mumbai
+
+Orders Table
+============
+order Num       Supplier Id         City
+-----------------------------------------
+101             1                   Allahabad
+102             2                   Kanpur
+
+SELECT columns FROM table1 FULL [OUTER] JOIN table2 ON table1.column = table2.column;
+
+SELECT suppliers.supplier_id, suppliers.supplier_name, orders.order_number
+FROM suppliers
+FULL OUTER JOIN orders
+ON suppliers.supplier_id = orders.supplier_id;
+
+Output
+======
+supplier_id   | supplier_name        | order_number
+---------------------------------------------------
+1             | Bata Shoes           | 101
+2             | Walkaro Slippers     | 102
+3             | Bombay Dying Shocks  | NULL
+NULL          | NULL                 | NULL
+
+Explanation:
+============
+Supplier ID 1 ("Bata Shoes") has an order associated with it, which is Order Number 101.
+Supplier ID 2 ("Walkaro Slippers") has an order associated with it, which is Order Number 102.
+Supplier ID 3 ("Bombay Dying Shocks") does not have any orders associated with it, so it appears in the
+result set with a NULL value for the order number.
+The last row with NULL values represents an order that does not have a corresponding supplier. This occurs
+because of the FULL OUTER JOIN, which includes all rows from both tables, regardless of whether there is a
+match.
 
 26. What is the difference between INNER JOIN and OUTER JOIN?
 1. INNER JOIN returns only the rows where there is a match in both tables.
