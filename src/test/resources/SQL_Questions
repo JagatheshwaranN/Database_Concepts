@@ -446,16 +446,111 @@ Explanation:
 3. For each supplier, there is a row for each customer, resulting in a total of 3 suppliers * 2 customers = 6
 rows in the output.
 
-26. What is the difference between INNER JOIN and OUTER JOIN?
+33. What is AntiJoin in Oracle?
+Anti-join is used to make the queries run faster. It is a very powerful SQL construct Oracle offers for
+faster queries.
+Anti-join between two tables returns rows from the first table where no matches are found in the second
+table. It is opposite of a semi-join. An anti-join returns one copy of each row in the first table for
+which no match is found.
+Anti-joins are written using the NOT EXISTS or NOT IN constructs.
+
+Department Table
+================
+Department_Id       Department_Name
+-----------------------------------
+1                   HR
+2                   Finance
+3                   Management
+
+Employee Table
+==============
+Employee_Id     First_Name      Last_Name       Department_Id
+-------------------------------------------------------------
+1               John            Smith           1
+2               Alex            PeterSon        -
+3               Erick           Son             2
+
+SELECT department.department_id, department.department_name
+FROM     department
+WHERE    NOT EXISTS
+(SELECT 1 FROM employee WHERE employee.department_id = department.department_id)
+ORDER BY department.department_id;
+
+Output
+======
+Department_Id | Department_Name
+--------------------------------
+3             | Management
+
+Explanation:
+============
+1. SELECT department.Department_Id, department.Department_Name: This part of the query selects the
+Department_Id and Department_Name columns from the Department table.
+2. FROM Department: We specify the Department table as the source of data.
+3. WHERE NOT EXISTS: This clause is used to filter out departments for which the subquery does not
+return any rows.
+4. SELECT 1 FROM Employee WHERE Employee.Department_Id = Department.Department_Id: This is a subquery
+that checks if there are any rows in the Employee table where the Department_Id matches the
+Department_Id of the outer query. If no such rows exist, the NOT EXISTS condition evaluates to true
+for that department.
+5. ORDER BY department.Department_Id: This orders the result set by the Department_Id in ascending
+order.
+
+34. What is Semi Join in Oracle?
+Semi-join is introduced in Oracle 8.0. It provides an efficient method of performing a WHERE EXISTS
+sub-query.
+A semi-join returns one copy of each row in first table for which at least one match is found.
+Semi-joins are written using the EXISTS construct.
+
+Department Table
+================
+Department_Id       Department_Name
+-----------------------------------
+1                   HR
+2                   Finance
+3                   Management
+
+Employee Table
+==============
+Employee_Id     First_Name      Last_Name       Department_Id
+-------------------------------------------------------------
+1               John            Smith           1
+2               Alex            PeterSon        -
+3               Erick           Son             2
+
+SELECT department.department_id, department.department_name
+FROM     department
+WHERE    EXISTS
+(SELECT 1 FROM employee WHERE employee.department_id = department.department_id)
+ORDER BY department.department_id;
+
+Output
+======
+Department_Id   Department_Name
+--------------------------------
+1               HR
+2               Finance
+
+Explanation
+===========
+1. The Department table has three departments: HR, Finance, and Management.
+2. The Employee table has two records with valid Department_Id values (1 and 2).
+3. The query retrieves departments from the Department table where there is at least one corresponding
+record in the Employee table.
+4. Departments with Department_Id 1 (HR) and 2 (Finance) have employees associated with them, so they
+satisfy the condition and are returned as the output. The department with Department_Id 3 (Management)
+does not have any employees associated with it, so it is excluded from the result.
+
+34. What is the difference between INNER JOIN and OUTER JOIN?
 1. INNER JOIN returns only the rows where there is a match in both tables.
 2. OUTER JOIN returns all rows from one or both tables, depending on the type of outer join, and includes
 unmatched rows with NULL values.
 
-27. What is a self-join, and how is it used?
+35. What is a self-join, and how is it used?
 A self-join is a join in which a table is joined with itself. It is often used to compare rows within
 the same table or to find hierarchical relationships within the table.
 
-28. What is the difference between a join condition specified in the WHERE clause and the ON clause?
+36. What is the difference between a join condition specified in the WHERE clause and the ON clause?
 1. The join condition specified in the WHERE clause is used for implicit joins, where tables are listed with
 commas in the FROM clause.
 2. The ON clause is used for explicit joins (ANSI SQL syntax) and specifies the join condition directly after
