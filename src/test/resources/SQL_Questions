@@ -556,3 +556,94 @@ commas in the FROM clause.
 2. The ON clause is used for explicit joins (ANSI SQL syntax) and specifies the join condition directly after
 the JOIN keyword.
 
+37. Describe the common aggregate functions in Oracle (COUNT, SUM, AVG, MIN, MAX)?
+1. AVG(): Calculates the average value of a numeric column.
+2. COUNT(): Counts the number of rows in a result set or the number of non-null values in a column.
+3. MAX(): Returns the maximum value in a set of values.
+4. MIN(): Returns the minimum value in a set of values.
+5. SUM(): Calculates the sum of values in a set.
+
+38. Describe about the arithmetic operators in oracle?
+In Oracle SQL, arithmetic operators are used to perform mathematical operations on numeric
+data types. Here are the commonly used arithmetic operators:
+Addition (+): The addition operator is used to add two numeric values together.
+Example:
+SELECT 5 + 3; -- Output: 8
+Subtraction (-): The subtraction operator is used to subtract one numeric value from another.
+Example:
+SELECT 10 - 4; -- Output: 6
+Multiplication (*): The multiplication operator is used to multiply two numeric values together.
+Example:
+SELECT 5 * 4; -- Output: 20
+Division (/): The division operator is used to divide one numeric value by another.
+Example:
+SELECT 20 / 5; -- Output: 4
+Integer Division (DIV): The integer division operator is used to divide one numeric value by
+another and return only the integer part of the result.
+Example:
+SELECT 20 DIV 3; -- Output: 6
+Modulus (MOD): The modulus operator returns the remainder of a division operation.
+Example:
+SELECT 20 MOD 3; -- Output: 2 (20 divided by 3 leaves a remainder of 2)
+Exponentiation () or POWER()**: The exponentiation operator or the POWER() function is used to
+raise a numeric value to the power of another numeric value.
+Example:
+SELECT POWER(2, 3); -- Output: 8 (2 raised to the power of 3)
+SELECT 2 ** 3; -- Output: 8 (alternative syntax)
+
+39. Describe the use of Like clause in Oracle?
+The LIKE clause in SQL is used to search for a specified pattern in a column. It is commonly
+used in WHERE clauses to filter rows based on patterns rather than exact matches. The LIKE
+clause is particularly useful when you want to perform wildcard searches or search for patterns
+within text data.
+
+SELECT column1, column2 FROM table_name WHERE column_name LIKE pattern;
+
+SELECT * FROM products WHERE product_name LIKE 'Apple%';
+-- This query will match any product_name that starts with 'Apple'.
+
+SELECT * FROM products WHERE product_name LIKE '%Apple%';
+-- This query will match any product_name that has 'Apple' anywhere in name.
+
+SELECT * FROM products WHERE product_name LIKE '%Apple';
+-- This query will match any product_name that ends with 'Apple'.
+
+SELECT * FROM customers WHERE phone_number LIKE '555-1_';
+-- This query will match phone numbers in the format '555-1' followed by any single character.
+
+SELECT * FROM employees WHERE last_name LIKE '[C-E]%';
+-- This query will match last names starting with 'C', 'D', or 'E'.
+
+SELECT * FROM products WHERE product_name LIKE '[^A-D]%';
+-- This query will match product names that do not start with 'A', 'B', 'C', or 'D'.
+
+40. Describe the SET operators available in Oracle?
+SET operators are used to combine the results of two or more SELECT statements. These operators
+allow you to perform set operations, such as union, intersection, and difference, on the result
+sets of queries. Here are the SET operators available in Oracle:
+
+UNION: The UNION operator is used to combine the results of two or more SELECT statements into a
+single result set. It removes duplicate rows from the result set by default.
+
+UNION ALL: The UNION ALL operator is similar to UNION but does not remove duplicate rows from the
+result set. It includes all rows from both SELECT statements, even if they are duplicates.
+
+INTERSECT: The INTERSECT operator is used to return the intersection of the result sets of two or
+more SELECT statements. It returns only the rows that appear in all result sets.
+
+MINUS (or EXCEPT): The MINUS operator is used to return the difference between the result sets of
+two SELECT statements. It returns only the rows that appear in the first result set but not in the
+second result set.
+
+41. What is a View in Oracle. How to create a View and retrieve the data from the View?
+A view is a virtual table that is based on the result set of a SELECT query. A view does not store
+data itself; instead, it retrieves data dynamically from one or more underlying tables or other
+views. Views are useful for simplifying complex queries, providing a layer of abstraction over
+underlying data, and restricting access to certain columns or rows.
+
+CREATE VIEW employee_view AS SELECT employee_id, first_name, last_name, hire_date
+FROM employees WHERE department_id = 30;
+
+SELECT * FROM employee_view;
+
+
