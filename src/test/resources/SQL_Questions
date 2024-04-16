@@ -302,6 +302,150 @@ The last row with NULL values represents an order that does not have a correspon
 because of the FULL OUTER JOIN, which includes all rows from both tables, regardless of whether there is a
 match.
 
+30. What is EQUI JOIN in Oracle?
+Oracle Equi join returns the matching column values of the associated tables. It uses a comparison operator
+in the WHERE clause to refer equality.
+
+Equi join also can be performed by using JOIN keyword followed by ON keyword and then specifying names of the
+columns along with their associated tables to check equality.
+
+Agent Table
+===========
+Agent_Id    Agent_Name    Agent_City
+------------------------------------
+1           John          Texas
+2           Alex          Missouri
+3           Erick         New Jersey
+
+Customer Table
+==============
+Cust_Id     FirstName     LastName
+----------------------------------
+3           Erick         Samson
+4           Richard       Peterson
+
+SELECT column_list FROM table1, table2 WHERE table1.column_name = table2.column_name;
+SELECT * FROM table1 JOIN table2 [ON (join_condition)]
+
+SELECT agents.agent_city, customer.LastName, customer.FirstName
+FROM Agent, Customer WHERE agents.Agent_Id = customer.Cust_Id;
+
+SELECT agents.agent_city, customer.LastName, customer.FirstName
+FROM Agent JOIN Customer ON agents.Agent_Id = customer.Cust_Id;
+
+Output
+======
+Agent_City    LastName    FirstName
+-----------------------------------
+New Jersey    Samson      Erick
+
+Explanation:
+============
+1. The query performs an inner join between the Agent table and the Customer table based on matching Agent_Id
+from the Agent table with Cust_Id from the Customer table.
+2. Only one row is returned because there's a match between Agent_Id 3 in the Agent table and Cust_Id 3 in the
+Customer table.
+3. The resulting row includes the Agent_City from the Agent table and the LastName and FirstName from the
+Customer table for the matched customer.
+
+31. What is Self Join in Oracle?
+A self-join is a join operation where a table is joined with itself. This is useful when you want to compare
+rows within the same table or find hierarchical relationships within the table.
+
+Employees Table
+===============
+Employee_ID  |  Employee_Name  |  Manager_ID
+--------------------------------------------
+1            |  John           |  3
+2            |  Alice          |  1
+3            |  Smith          |  NULL
+4            |  Emily          |  3
+5            |  Bob            |  2
+
+In this table, the Manager_ID column represents the ID of the manager for each employee. The manager of an
+employee is also an employee in the same table.
+
+SELECT e.Employee_Name AS Employee, m.Employee_Name AS Manager
+FROM Employees e INNER JOIN Employees m ON e.Manager_ID = m.Employee_ID;
+
+SELECT e.Employee_Name AS Employee, m.Employee_Name AS Manager
+FROM Employees e, Employees m
+WHERE e.Manager_ID = m.Employee_ID;
+
+Output
+======
+Employee  |  Manager
+---------------------
+John      |  Smith
+Alice     |  John
+Smith     |  NULL
+Emily     |  Smith
+Bob       |  Alice
+
+Explanation
+============
+We are selecting two columns, aliased as Employee and Manager, which represent the employee's name and their
+manager's name, respectively.
+
+We're performing an inner join between the Employees table, aliased as e, and itself, aliased as m.
+
+The ON clause specifies the condition for the join, which is e.Manager_ID = m.Employee_ID. This means that we
+are matching each employee's Manager_ID with another employee's Employee_ID, effectively finding the manager
+for each employee.
+
+Since it's an inner join, only rows with matching Manager_ID and Employee_ID values will be included in the
+result set. This means that employees without managers or managers without employees will not appear in the
+result.
+
+Finally, we alias the columns to distinguish between the employee's name (Employee) and the manager's name
+(Manager).
+
+32. What is Cross Join in Oracle?
+The CROSS JOIN specifies that all rows from first table join with all of the rows of second table. If there
+are "x" rows in table1 and "y" rows in table2 then the cross join result set have x*y rows. It normally happens
+when no matching join columns are specified.
+
+In simple words you can say that if two tables in a join query have no join condition, then the Oracle returns
+their Cartesian product.
+
+SELECT * FROM table1 CROSS JOIN table2;
+SELECT * FROM table1, table2;
+
+Customer Table
+==============
+Cust_Id     FirstName     LastName
+----------------------------------
+1           Erick         Samson
+2           Richard       Peterson
+
+Suppliers Table
+===============
+Supplier Id     Supplier Name           Supplier Address
+-------------------------------------------------------
+1               Bata Shoes              Agra
+2               Walkaro Slippers        Delhi
+3               Bombay Dying Shocks     Mumbai
+
+SELECT * FROM Suppliers CROSS JOIN Customer;
+
+Output
+======
+Supplier Id  |  Supplier Name         |  Supplier Address     |  Cust_Id  |  FirstName  |  LastName
+-----------------------------------------------------------------------------------------------------
+1            |  Bata Shoes            |  Agra                 |  1        |  Erick      |  Samson
+2            |  Walkaro Slippers      |  Delhi                |  1        |  Erick      |  Samson
+3            |  Bombay Dying Shocks   |  Mumbai               |  1        |  Erick      |  Samson
+1            |  Bata Shoes            |  Agra                 |  2        |  Richard    |  Peterson
+2            |  Walkaro Slippers      |  Delhi                |  2        |  Richard    |  Peterson
+3            |  Bombay Dying Shocks   |  Mumbai               |  2        |  Richard    |  Peterson
+
+Explanation:
+============
+1. Each row from the Suppliers table is combined with every row from the Customer table.
+2. The resulting table has all possible combinations of supplier and customer data.
+3. For each supplier, there is a row for each customer, resulting in a total of 3 suppliers * 2 customers = 6
+rows in the output.
+
 26. What is the difference between INNER JOIN and OUTER JOIN?
 1. INNER JOIN returns only the rows where there is a match in both tables.
 2. OUTER JOIN returns all rows from one or both tables, depending on the type of outer join, and includes
