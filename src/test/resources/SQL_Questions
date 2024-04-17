@@ -886,6 +886,11 @@ BEGIN
 END;
 /
 
+BEGIN
+    get_employee_details(1001); -- Example employee ID
+END;
+/
+
 Explanation:
 ============
 1. This procedure calculate_order_total takes an order_id as input.
@@ -893,3 +898,43 @@ Explanation:
 quantity from the order_items table.
 3. The result is stored in the total_amount variable.
 4. Finally, it displays the total amount using DBMS_OUTPUT.PUT_LINE.
+
+** Procedure with Parameters **
+===============================
+CREATE PROCEDURE GetEmployeeDetails
+AS
+BEGIN
+    SELECT * from Employees;
+END
+/
+
+EXEC GetEmployeeDetails;
+
+** Procedure with Parameters - IN **
+====================================
+CREATE PROCEDURE GetEmployeeDetail ( EmpId IN Number)
+AS
+BEGIN
+    SELECT * from Employees where EmpId = GetEmployeeDetail.EmpId;
+END
+/
+
+** Procedure with Parameters - IN & OUT **
+==========================================
+variable n1 number;
+CREATE OR REPLACE PROCEDURE GetSalary(eid IN Employees.EmpId%type,
+sal OUT Employees.EmpSal%type) IS
+BEGIN
+    SELECT EmpSal INTO sal from Employees where EmpId = eid;
+END
+/
+
+execute GetSalary(101, :n1);
+print :n1;
+
+N1
+-----
+50000
+
+
+
