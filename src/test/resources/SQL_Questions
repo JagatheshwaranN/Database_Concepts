@@ -734,4 +734,94 @@ Explanation:
 - 100,000).
 3. If not, it raises an application error to prevent the invalid data from being saved.
 
+Types
+=====
+1. DML Triggers
+2. DDL Triggers
 
+CREATE OR REPLACE TRIGGER Add_Row_TR
+BEFORE UPDATE ON ACCOUNTS
+FOR EACH ROW
+BEGIN
+    INSERT INTO TRANSACTIONS
+    (TxnId, ActNo, TxnDate, Amt, Bal)
+    values (ac_seq.nextval, :new.ActNo, sysdate, abs(:new.balance - :old.balance), :new.balance);
+END
+/
+
+48. What is the use of Sequence in Oracle?
+A sequence in Oracle is a database object that generates a unique, ordered series of numeric values.
+It's a valuable tool for ensuring that every row inserted into a table gets a distinct identifier,
+even when multiple users are concurrently adding data.
+
+CREATE SEQUENCE sequence_name
+START WITH initial_value  -- Starting value
+INCREMENT BY increment_value  -- Amount to increment by (default 1)
+MINVALUE minimum_value (optional)  -- Lower limit
+MAXVALUE maximum_value (optional)  -- Upper limit
+[CYCLE | NOCYCLE]  -- Whether to wrap around after reaching max value
+[CACHE size] (optional) -- Pre-allocate a pool of sequence numbers
+
+START WITH: The initial value for the sequence.
+INCREMENT BY: The amount to increment by for each new value (default 1).
+MINVALUE (optional): The lowest allowed value in the sequence.
+MAXVALUE (optional): The highest allowed value in the sequence.
+CYCLE: Allows the sequence to wrap around and start over after reaching the MAXVALUE.
+NOCYCLE (default): Prevents the sequence from wrapping around; an error occurs when MAXVALUE
+is reached.
+CACHE (optional): Pre-allocates a pool of sequence numbers for improved performance.
+
+-- Basic sequence (starts at 1, increments by 1, no limits)
+CREATE SEQUENCE my_sequence;
+
+-- Sequence with starting value and increment
+CREATE SEQUENCE order_seq
+START WITH 100  -- Starting value
+INCREMENT BY 5;  -- Increment by 5
+
+-- Sequence with limits and no wrapping
+CREATE SEQUENCE product_id_seq
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 9999  -- Maximum allowed value
+NOCYCLE;        -- Disallow wrapping around
+
+-- Sequence with wrapping around
+CREATE SEQUENCE customer_id_seq
+START WITH 1000
+INCREMENT BY 1
+MAXVALUE 9999
+CYCLE;          -- Allow wrapping around after reaching max
+
+49. What is the use of Indexes in Oracle?
+Indexes are special database structures that significantly improve the performance of queries
+by providing a faster way to locate specific data in tables. They act like an index in a book,
+pointing to the relevant information without having to scan the entire table.
+
+**1. Basic Index on a Single Column:**
+=======================================
+CREATE INDEX idx_customer_name ON customers(customer_name);
+This code creates an index named `idx_customer_name` on the `customer_name` column of the
+`customers` table. This will improve searches and filtering based on customer names.
+
+**2. Index on Multiple Columns:**
+=================================
+CREATE INDEX idx_order_details ON orders(customer_id, order_date);
+This index named `idx_order_details` is created on two columns: `customer_id` and `order_date`
+in the `orders` table. This can be useful for queries that filter or join data based on both
+customer and order date.
+
+**3. Unique Index (enforces uniqueness):**
+==========================================
+CREATE UNIQUE INDEX ux_email ON users(email);
+This creates a unique index named `ux_email` on the `email` column in the `users` table. This
+ensures that no duplicate email addresses exist in the table.
+
+**4. Including a Subset of Characters:**
+========================================
+CREATE INDEX idx_product_name_start ON products(SUBSTR(product_name, 1, 10));
+
+This index named `idx_product_name_start` is created on the first 10 characters
+(`SUBSTR(product_name, 1, 10)`) of the `product_name` column in the `products` table.
+This can be helpful for searches that start with specific keywords.
