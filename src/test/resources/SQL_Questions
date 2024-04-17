@@ -825,3 +825,71 @@ CREATE INDEX idx_product_name_start ON products(SUBSTR(product_name, 1, 10));
 This index named `idx_product_name_start` is created on the first 10 characters
 (`SUBSTR(product_name, 1, 10)`) of the `product_name` column in the `products` table.
 This can be helpful for searches that start with specific keywords.
+
+50. What is Stored Procedures in Oracle?
+Stored procedures are pre-compiled PL/SQL program blocks that encapsulate a specific set of
+database operations. They act like reusable mini-programs stored within the database.
+
+Stored procedures in Oracle are named PL/SQL blocks that perform one or more tasks or operations.
+They allow you to encapsulate a set of SQL and procedural statements into a single unit, which
+can be invoked repeatedly by applications or other database objects. Stored procedures enhance
+code modularity, reusability, and security by centralizing database logic.
+
+Example
+=======
+CREATE OR REPLACE PROCEDURE get_employee_details (p_employee_id IN NUMBER)
+IS
+    v_first_name  Employees.FirstName%TYPE;
+    v_last_name   Employees.LastName%TYPE;
+    v_salary      Employees.Salary%TYPE;
+BEGIN
+    -- Retrieve employee details based on the provided employee ID
+    SELECT FirstName, LastName, Salary
+    INTO v_first_name, v_last_name, v_salary
+    FROM Employees
+    WHERE EmployeeID = p_employee_id;
+
+    -- Print employee details
+    DBMS_OUTPUT.PUT_LINE('Employee ID: ' || p_employee_id);
+    DBMS_OUTPUT.PUT_LINE('First Name: ' || v_first_name);
+    DBMS_OUTPUT.PUT_LINE('Last Name: ' || v_last_name);
+    DBMS_OUTPUT.PUT_LINE('Salary: ' || v_salary);
+END;
+/
+
+Explanation:
+============
+1. CREATE OR REPLACE PROCEDURE is the syntax for creating a new stored procedure or replacing
+an existing one.
+2. get_employee_details is the name of the stored procedure.
+3. (p_employee_id IN NUMBER) is the input parameter declaration. The procedure expects an
+employee ID as input.
+4. IS marks the beginning of the procedure's executable section.
+5. v_first_name, v_last_name, and v_salary are local variables used to store employee details
+retrieved from the database.
+6. The SELECT INTO statement retrieves the FirstName, LastName, and Salary of the employee
+with the provided EmployeeID and stores them in the respective variables.
+7. The DBMS_OUTPUT.PUT_LINE statements print the employee details.
+8. END; marks the end of the procedure.
+
+CREATE OR REPLACE PROCEDURE calculate_order_total (
+  order_id IN NUMBER
+)
+AS
+  total_amount NUMBER;
+BEGIN
+  SELECT SUM(unit_price * quantity) INTO total_amount
+  FROM order_items
+  WHERE order_id = calculate_order_total.order_id;
+
+  DBMS_OUTPUT.PUT_LINE('Total amount for order ' || order_id || ': ' || total_amount);
+END;
+/
+
+Explanation:
+============
+1. This procedure calculate_order_total takes an order_id as input.
+2. It calculates the total amount for the order by summing the product of unit price and
+quantity from the order_items table.
+3. The result is stored in the total_amount variable.
+4. Finally, it displays the total amount using DBMS_OUTPUT.PUT_LINE.
