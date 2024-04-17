@@ -646,4 +646,92 @@ FROM employees WHERE department_id = 30;
 
 SELECT * FROM employee_view;
 
+42. What is the use of Order By Clause in Oracle?
+The ORDER BY clause in Oracle is used to sort the result set returned by a query based on one or
+more columns. It allows you to specify the order in which you want the rows to be displayed, either
+in ascending (default) or descending order.
+
+SELECT FirstName, LastName FROM Employees ORDER BY LastName;
+SELECT customer_name, order_total FROM orders ORDER BY order_total DESC;
+
+Null Handling:
+==============
+By default, NULL values are sorted last in ascending order (ASC) and first in descending order (DESC).
+You can explicitly control null handling using the NULLS FIRST or NULLS LAST keywords after the column
+name:
+ORDER BY column_name ASC NULLS LAST  -- Sort ascending, NULLs last
+ORDER BY column_name DESC NULLS FIRST -- Sort descending, NULLs first
+
+43. Explain the difference between SYSDATE and CURRENT_DATE in Oracle SQL.
+1. SYSDATE returns the current date and time from the system clock, including fractional seconds.
+2. CURRENT_DATE also returns the current date but without the time portion (it is truncated to
+midnight).
+
+44. What is the use of Group By Clause in Oracle?
+The GROUP BY clause in Oracle's SQL (Structured Query Language) is used to categorize and summarize
+data based on specific columns. It groups rows with matching values in the specified columns,
+allowing you to perform aggregate operations (like COUNT, SUM, AVG, MIN, MAX) on those groups.
+
+SELECT department_name, COUNT(*) AS employee_count FROM employees GROUP BY department_name;
+
+This query selects the department_name and uses COUNT(*) to count the number of employees
+(represented by employee_count) in each department from the employees table. The results are
+grouped by department_name.
+
+45. What is the difference between WHERE and HAVING clauses?
+1. WHERE filters rows before grouping (based on individual row values).
+2. HAVING filters groups after grouping (based on aggregate values).
+
+46. What is the use of Having Clause in Oracle?
+The HAVING clause is used to filter groups of data created by the GROUP BY clause. It allows
+you to specify conditions that must be met for a group to be included in the final result set.
+
+Here's how it works:
+1. Grouping: The GROUP BY clause categorizes rows with matching values in the specified columns.
+2. Aggregate Calculations: Aggregate functions (like COUNT, SUM, AVG) are applied to each group.
+3. HAVING Filtering: The HAVING clause filters the groups based on a condition that involves the
+aggregate values or columns used in the GROUP BY. Only groups that satisfy the HAVING condition
+are included in the final results.
+
+SELECT department_name, COUNT(*) AS employee_count
+FROM employees GROUP BY department_name
+HAVING COUNT(*) > 5;
+
+47. What is trigger in Oracle?
+A trigger is a special type of PL/SQL program that automatically executes ("fires") in response
+to a specific event or condition. These events are typically related to data manipulation
+operations performed on tables or views within the database.
+
+How Triggers Work:
+==================
+1. Trigger Definition: You create a trigger using the CREATE TRIGGER statement. This statement
+specifies the trigger's:
+    1. Name: Unique identifier for the trigger.
+    2. Event: The DML (Data Manipulation Language) operation (e.g., INSERT, UPDATE, DELETE) or
+    other events (e.g., system events) that trigger the code execution.
+    3. Timing: When the trigger fires relative to the event (e.g., BEFORE or AFTER the DML statement).
+    4. Body: The PL/SQL code block that defines the actions to be performed when the trigger fires.
+2. Event Occurs: When a qualifying DML operation or other event happens on the associated table or
+view.
+3. Trigger Execution: Oracle automatically executes the PL/SQL code defined in the trigger's body.
+
+Example
+=======
+CREATE OR REPLACE TRIGGER Salary_Check
+BEFORE INSERT OR UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+    IF :New.Salary < 30000 OR :New.Salary > 100000 THEN
+        RAISE APPLICATION_ERROR(-20001, 'Salary must be between 30,000 and 100,000');
+    END IF;
+END;
+/
+
+Explanation:
+============
+1. This trigger named salary_check fires before an INSERT or UPDATE on the employees table.
+2. It checks if the new salary value (NEW.Salary) falls within the specified range (30,000
+- 100,000).
+3. If not, it raises an application error to prevent the invalid data from being saved.
+
 
