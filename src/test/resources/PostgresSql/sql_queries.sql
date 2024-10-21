@@ -87,3 +87,10 @@ insert into sales_order (order_id, order_date, quantity, product_code, status)
 values (default, to_date('05-04-2024', 'dd-mm-yyyy'), 1, 2, 'Pending');
 insert into sales_order (order_id, order_date, quantity, product_code, status)
 values (default, to_date('07-08-2024', 'dd-mm-yyyy'), 1, 15, 'Completed');
+create table sales_order (
+	order_id int primary key generated always as identity,
+	order_date date,
+	quantity int,
+	product_code int references products(product_code),
+	status varchar(30)
+);
