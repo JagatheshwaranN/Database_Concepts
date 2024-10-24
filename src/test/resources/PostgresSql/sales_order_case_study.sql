@@ -70,4 +70,35 @@ from sales_order so
 join customers c on c.id = so.customer_id
 group by c.name;
 
+-- 9) Display the total sales and average sales done for each day.
+select order_date, sum(price * quantity) as total_sales, avg(price * quantity) as average_sales
+from sales_order so
+join products p on p.id = so.prod_id
+group by order_date
+order by order_date;
 
+-- 10) Display the customer name, employee name, and total sale amount of all orders
+-- which are either on hold or pending.
+select c.name as customer, e.name as employee, sum(so.quantity * p.price) as total_sales
+from sales_order so
+join employees e on so.emp_id = e.id
+join products p on so.prod_id = p.id
+join customers c on so.customer_id = c.id
+where so.status in ('On Hold', 'Pending')
+group by c.name, e.name;
+
+-- 11) Fetch all the orders which were neither completed / pending or were handled by the
+-- employee Abrar. Display employee name and all details of order.
+select e.name, so.*
+from sales_order so
+join employees e on e.id = so.emp_id
+where lower(so.status) not in ('completed', 'pending')
+or e.name like '%Abrar%';
+
+-- 12) Fetch the orders which costs more than 2000 but did not include the macbook pro.
+-- Print the total sale amount as well.
+select so.*, p.name, (quantity * price) as total_cost
+from sales_order so 
+join products p on p.id = so.prod_id
+where (quantity * price) > 2000
+and lower(p.name) not like '%macbook%';
