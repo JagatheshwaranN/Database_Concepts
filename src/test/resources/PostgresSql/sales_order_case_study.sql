@@ -102,3 +102,61 @@ from sales_order so
 join products p on p.id = so.prod_id
 where (quantity * price) > 2000
 and lower(p.name) not like '%macbook%';
+
+-- 13) Identify the customers who have not purchased any product yet.
+
+-- Approach 1 [Sub Query]
+select * 
+from customers 
+where id not in (select distinct customer_id from sales_order);
+
+-- Approach 2 [Left Join]
+select c.*
+from customers c
+left join sales_order so
+on c.id = so.customer_id
+where so.order_id is null;
+
+-- Approach 3 [Right Join]
+select c.*
+from sales_order so
+right join customers c
+on c.id = so.customer_id
+where so.order_id is null;
+
+-- 14) Write a query to identify the total products purchased by each customer. Return
+-- all customers irrespective of whether they have made a purchase or not. Sort the 
+-- result with highest number of orders at the top.
+select c.name, coalesce(sum(so.quantity), 0) as total_products_purchased
+from customers c
+left join sales_order so 
+on c.id = so.customer_id
+group by c.name
+order by total_products_purchased desc;
+
+-- 15) Corresponding to each employee, display the total sales they made of all the
+-- completed orders. Display the total sales as 0 if an employee made no sales yet.
+select e.name as employee, coalesce(sum(quantity * price),0) as total_sales
+from sales_order so
+join products p on p.id = so.prod_id
+right join employees e on e.id = so.emp_id 
+and lower(so.status) = 'completed'
+group by e.name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
