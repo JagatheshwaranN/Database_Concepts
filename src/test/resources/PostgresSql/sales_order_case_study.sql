@@ -143,6 +143,57 @@ right join employees e on e.id = so.emp_id
 and lower(so.status) = 'completed'
 group by e.name;
 
+-- 16) Rewrite the above query so as to display the total sales made by each employee
+-- corresponding to each customer. If an employee has not served a customer yet then
+-- display "-" under the customer.
+select e.name as employee, coalesce(c.name,'-') as customer, coalesce(sum(quantity * price),0) as total_sales
+from sales_order so
+join products p on p.id = so.prod_id
+right join customers c on c.id = so.customer_id
+right join employees e on e.id = so.emp_id 
+and lower(so.status) = 'completed'
+group by e.name, c.name
+order by 1, 2;
+
+-- 17) Rewrite the above query so as to display only those records where the total sales
+-- is above 1000.
+select e.name as employee, coalesce(c.name,'-') as customer, coalesce(sum(quantity * price),0) as total_sales
+from sales_order so
+join products p on p.id = so.prod_id
+right join customers c on c.id = so.customer_id
+right join employees e on e.id = so.emp_id 
+and lower(so.status) = 'completed'
+group by e.name, c.name
+having coalesce(sum(quantity * price),0) > 1000
+order by 1, 2;
+
+-- 18) Identify the employees who has served more than 2 customers.
+select e.name as employee, count(distinct c.name) as customer
+from sales_order so
+join employees e on e.id = so.emp_id
+join customers c on c.id = so.customer_id
+group by e.name
+having count(distinct c.name) > 2;
+
+-- 19) Identify the customers who has purchased more than 5 products.
+select c.name, sum(so.quantity) as total_products
+from sales_order so
+join customers c on c.id = so.customer_id
+group by c.name
+having sum(so.quantity) > 5;
+
+-- 20) Identify customers whose average purchase cost exceeds the average sale
+-- of all the orders.
+select c.name as customer, avg(quantity * price) as average_purchase
+from sales_order so
+join customers c on c.id = so.customer_id
+join products p on p.id = so.prod_id
+group by c.name
+having avg(quantity * price) >
+(select avg(quantity * price) 
+from sales_order so
+join products p on p.id = so.prod_id);
+
 
 
 
