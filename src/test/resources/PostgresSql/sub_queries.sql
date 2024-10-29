@@ -45,6 +45,28 @@ insert into employee values(122, 'Ibrahim', 'IT', 8000);
 insert into employee values(123, 'Vikram', 'IT', 8000);
 insert into employee values(124, 'Dheeraj', 'IT', 11000);
 
+create table sales
+(
+	store_id  		int,
+	store_name  	varchar(50),
+	product_name	varchar(50),
+	quantity		int,
+	price	     	int
+);
+insert into sales values
+(1, 'Apple Store 1','iPhone 13 Pro', 1, 1000),
+(1, 'Apple Store 1','MacBook pro 14', 3, 6000),
+(1, 'Apple Store 1','AirPods Pro', 2, 500),
+(2, 'Apple Store 2','iPhone 13 Pro', 2, 2000),
+(3, 'Apple Store 3','iPhone 12 Pro', 1, 750),
+(3, 'Apple Store 3','MacBook pro 14', 1, 2000),
+(3, 'Apple Store 3','MacBook Air', 4, 4400),
+(3, 'Apple Store 3','iPhone 13', 2, 1800),
+(3, 'Apple Store 3','AirPods Pro', 3, 750),
+(4, 'Apple Store 4','iPhone 12 Pro', 2, 1500),
+(4, 'Apple Store 4','MacBook pro 16', 1, 3500);
+
+
 select * from employee;
 select * from department;
 
@@ -114,3 +136,65 @@ from employee e1
 where salary > ( select avg(salary) 
 				 from employee e2
 				 where e2.dept_name = e1.dept_name);
+
+-- Sub Queries can be used in 4 clauses as below.
+-- SELECT
+-- FROM
+-- WHERE
+-- HAVING
+
+-- 5) Find the department who do not have any employees using Correlated SubQueries.
+
+select * 
+from department d
+where not exists (
+select 1 
+from employee e 
+where e.dept_name = d.dept_name);
+
+-- Nested Sub Queries
+
+-- 6) Find the stores whose sales is better than the average sales across all stores.
+
+select *
+from ( select store_name, sum(price) as total_sales
+	   from sales
+	   group by store_name) sales
+join ( select avg(total_sales) as avg_sales
+	   from ( select store_name, sum(price) as total_sales
+	   from sales
+	   group by store_name)) as avg_sales
+on sales.total_sales > avg_sales.avg_sales;
+
+-- With clause is used to replace the sub queries which is used in multiple places.
+with sales as ( select store_name, sum(price) as total_sales
+	   from sales
+	   group by store_name )
+select *
+from sales
+join ( select avg(total_sales) as avg_sales
+       from sales ) avg_sales
+on sales.total_sales > avg_sales.avg_sales;
+
+-- Not Recommended [Using Sub Query in Select Clause]
+
+-- 7) Fetch all the employee details and add remarks to those employees who earn more
+-- than the average pay.
+
+select *,
+(case when salary > (select avg(salary) from employee)
+ 			then 'higher than average'
+ 		else null
+ end) as remarks
+from employee;
+
+-- Modifying above query
+
+select *,
+(case when salary > avg_sal.sal
+ 			then 'higher than average'
+ 		else null
+ end) as remarks
+from employee
+cross join (select avg(salary) sal from employee) avg_sal; 
+
