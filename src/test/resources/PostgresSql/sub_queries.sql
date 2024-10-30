@@ -66,9 +66,21 @@ insert into sales values
 (4, 'Apple Store 4','iPhone 12 Pro', 2, 1500),
 (4, 'Apple Store 4','MacBook pro 16', 1, 3500);
 
+CREATE TABLE employee_history
+(
+    emp_id      INT PRIMARY KEY,
+    emp_name    VARCHAR(50) NOT NULL,
+    dept_name   VARCHAR(50),
+    salary      INT,
+    location    VARCHAR(100),
+    constraint fk_emp_hist_01 foreign key(dept_name) references department(dept_name),
+    constraint fk_emp_hist_02 foreign key(emp_id) references employee(emp_id)
+);
 
 select * from employee;
 select * from department;
+select * from sales;
+select * from employee_history;
 
 -- Problem Solving
 
@@ -198,3 +210,59 @@ select *,
 from employee
 cross join (select avg(salary) sal from employee) avg_sal; 
 
+-- Sub Queries in Having clause
+
+-- 8) Find the stores which has sold more units than the average units sold 
+-- by all the stores.
+
+select store_name, sum(quantity)
+from sales
+group by store_name
+having sum(quantity) > (select avg(quantity)
+from sales);
+
+-- The subqueries can be used in another sql commands as well.
+-- INSERT
+-- UPDATE
+-- DELETE
+
+-- 9) Insert data to employee history table. Make sure not insert duplicate records.
+
+-- Scenario: Whenever we need to insert data into a table based on the availability
+-- of data in another tables. Then, we need to use Sub Queries.
+
+insert into employee_history
+select e.emp_id, e.emp_name, d.dept_name, e.salary, d.location
+from employee e
+join department d 
+on d.dept_name = e.dept_name
+where not exists (select 1
+from employee_history eh 
+where eh.emp_id = e.emp_id);
+
+select * from employee_history;
+
+-- 10) Given 10% increment to all the employees in bangalore location based on
+-- the maximum salary earned by employee in each dept. Only consider employees
+-- in employee_history table.
+
+Update employee e
+set salary = (select max(salary) + (max(salary) * 0.1)
+from employee_history eh 
+where eh.dept_name = e.dept_name)
+where e.dept_name in (select dept_name
+from department
+where location ='Bangalore')
+and
+e.emp_id in (select emp_id
+from employee_history);
+
+-- 11) Delete all departments which do not have any employees.
+
+delete 
+from department 
+where dept_name in (select dept_name 
+from department d 
+where not exists (select 1 
+from employee e
+where e.dept_name = d.dept_name));
