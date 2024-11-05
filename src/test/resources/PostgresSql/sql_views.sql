@@ -110,9 +110,36 @@ alter view order_summary rename to order_summary_2;
 -- Drop View
 drop view order_summary_2;
 
+-- Updatable View
+-- 1) Views should be created using 1 table / view only.
+-- 2) Cannot have distinct clause.
+-- 3) If query contains GROUP BY, then cannot update such views.
+-- 4) If query contains WITH clause, then cannot update such views.
+-- 5) If query contains WINDOW functions, then cannot update such views.
 
+create or replace view expensive_orders 
+as
+select *
+from tb_product_info
+where price >= 1500;
 
+select * from expensive_orders;
 
+insert into tb_product_info
+values ('P7', 'Test', 'Test', 1500);
 
+update expensive_orders
+set prod_name = 'Samsung A04', brand = 'Samsung'
+where prod_id = 'p7';
 
+-- With Check Option
+create or replace view apple_products
+as
+select * from tb_product_info where brand = 'Apple'
+with check option;
+
+select * from apple_products;
+
+insert into apple_products
+values ('P8', 'Air buds', 'Apple', 2500);
 
