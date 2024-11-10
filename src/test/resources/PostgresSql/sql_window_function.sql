@@ -203,3 +203,66 @@ range between 2 preceding and 2 following)
 as least_exp_prod
 from product_details
 where product_category = 'Phone';
+
+-- Alternate way to write a SQL query using Window Functions.
+select *,
+first_value(product_name) over w as most_exp_prod,
+last_value(product_name) over w as least_exp_prod
+from product_details
+window w as (partition by product_category order by price desc
+range between unbounded preceding and unbounded following);
+
+-- Nth Value
+-- 6) Write a query to display the second most expensive product under each category.
+select *,
+first_value(product_name) over w as most_exp_prod,
+last_value(product_name) over w as least_exp_prod,
+nth_value(product_name, 2) over w as second_most_exp_prod
+from product_details
+window w as (partition by product_category order by price desc
+range between unbounded preceding and unbounded following);
+
+-- NTile
+-- Whenever we want to group together a few records into some buckets.
+
+-- 7) Write a query to segregate all the expensive phones, mid range phones and 
+-- cheaper phones.
+select product_name, 
+case 
+when x.buckets = 1 then 'Expensive Phones'
+when x.buckets = 2 then 'Medium Phones'
+when x.buckets = 3 then 'Cheap Phones'
+end phone_category
+from (
+select *,
+ntile(3) over (order by price desc) as buckets
+from product_details
+where product_category = 'Phone') x;
+
+-- Cume_Dist [Cumulative Distribution]
+-- Value -> 1 <= CUME_DIST > 0
+-- Formula = Current Row No (or Row No with value same as current row) / Total no of rows
+
+-- 8) Query to fetch all products which are constituting the first 30% of the data
+-- in products table based on price.
+
+select product_name, (cume_dist_percent||'%') as cume_dist_percent
+from (select *, 
+cume_dist() over(order by price desc) as cume_distribution,
+round(cume_dist() over(order by price desc)::numeric * 100, 2) as cume_dist_percent
+from product_details) x
+where x.cume_dist_percent <= 30;
+
+-- Percent Rank [Relative Rank of the current row / Percentage Ranking]
+-- Value 1 <= PERCENT_RANK > 0
+-- Formula = Current row no - 1 / Total no of rows - 1
+
+-- 9) Query to identify how much percentage more expensive is "Galaxy S5" when
+-- compared to all products.
+select product_name, perc_rank 
+from
+( select *, 
+percent_rank() over(order by price desc) as percentage_rank,
+round(percent_rank() over(order by price desc)::numeric * 100, 2) as perc_rank
+from product_details ) x
+where x.product_name = 'Galaxy S5';
