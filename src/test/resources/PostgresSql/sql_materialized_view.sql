@@ -36,8 +36,18 @@ select * from mv_random_tab;
 -- Let's consider below scenario
 -- Deleting one of the record from the random_tab.
 delete from random_tab where id = 1;
+
 -- After deletion, base table has only one record.
 -- MView still has 2 records.
 
 -- To update MView, have to refresh it.
 refresh materialized view mv_random_tab;
+
+-- MView vs View
+-- When we create a view internally it stores the query. So, whenever
+-- we execute it, it will run the query and fetch the data.
+
+-- As we know, when we create a MView internally it stores the query and 
+-- the data. So, whenever we execute it, it will fetch the stored data.
+
+
