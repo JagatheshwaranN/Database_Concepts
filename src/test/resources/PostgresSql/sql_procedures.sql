@@ -61,7 +61,7 @@ select * from p_products;
 select * from p_sales;
 
 -- Simple Procedure Sample
--- For every iPhone 13 Pro Max sales, modify the database tables accordingly
+-- For every iPhone 13 Max Pro sales, modify the database tables accordingly
 create or replace procedure pr_buy_product()
 language plpgsql
 as $$
@@ -87,4 +87,28 @@ end;
 $$
 
 call pr_buy_product();
+
+--- Procedure in Oracle
+-- create or replace procedure pr_buy_product
+-- as 
+-- 	v_prod_code varchar(20);
+-- 	v_price int;
+-- begin
+-- 	select prod_code, price 
+-- 	into v_prod_code, v_price
+-- 	from p_products
+-- 	where prod_name = 'Iphone 13 Max Pro';
+	
+-- 	insert into p_sales(order_date, prod_code, qty_ordered, sale_price)
+-- 	values (current_date, v_prod_code, 1, (v_price * 1));
+	
+-- 	update p_products 
+-- 	set qty_remaining = (qty_remaining - 1),
+-- 	qty_sold = (qty_sold + 1)
+-- 	where prod_code = v_prod_code;
+	
+-- 	dbms_output.put_line ('Product Sold!');
+-- end;
+
+-- exec pr_buy_products;
 
