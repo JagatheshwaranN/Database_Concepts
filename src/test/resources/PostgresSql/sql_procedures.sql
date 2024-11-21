@@ -126,7 +126,13 @@ call pr_buy_product();
 -- For every given product and the quantity,
 -- 	1) Check if product is available based on the required quantity.
 -- 	2) If available then modify the database tables accordingly.
-create or replace procedure pr_buy_products(p_prod_name varchar, p_quantity int)
+
+-- Note
+-- By default, if we don't mention the type of input, then it will be
+-- treated as IN parameter. If its OUT parameter, then it has to be
+-- mentioned explicitly.
+
+create or replace procedure pr_buy_products(IN p_prod_name varchar, IN p_quantity int)
 language plpgsql
 as $$
 declare
@@ -147,7 +153,7 @@ begin
 		where prod_name = p_prod_name;
 		
 		insert into p_sales(order_date, prod_code, qty_ordered, sale_price)
-		values (current_date, v_prod_code, p_quantity, (v_price * 1));
+		values (current_date, v_prod_code, p_quantity, (v_price * p_quantity));
 		
 		update p_products 
 		set qty_remaining = (qty_remaining - p_quantity),
@@ -155,9 +161,44 @@ begin
 		where prod_code = v_prod_code;
 		raise notice 'Product Sold!';
 	else
-		raise notice 'Insufficient Quantiy!';
+		raise notice 'Insufficient Quantity!';
 	end if;	
 end;
 $$
 
 call pr_buy_products('iPad Air', 1);
+
+-- Procedure in Oracle
+-- create or replace procedure pr_buy_products(p_prod_name varchar, p_quantity int)
+-- as
+--     v_cnt           int;
+--     v_prod_code  varchar(20);
+--     v_price         int;
+-- begin
+
+--     select count(*)
+--     into v_cnt
+--     from products
+--     where prod_name = p_prod_name
+--     and qty_remaining >= p_quantity;
+
+--     if v_cnt > 0
+--     then
+--         select prod_code, price
+--         into v_prod_code, v_price
+--         from p_products
+--         where prod_name = p_prod_name
+--         and qty_remaining >= p_quantity;
+
+--         insert into p_sales (order_date,prod_code,qty_ordered,sale_price)
+-- 			values (current_date, v_prod_code, p_quantity, (v_price * p_quantity));
+
+--         update p_products
+--         set qty_remaining = (qty_remaining - p_quantity)
+--         , qty_sold = (qty_sold + p_quantity)
+--         where prod_code = v_prod_code;
+--         dbms_output.put_line('Product sold!');
+--     else
+--         dbms_output.put_line('Insufficient Quantity!');
+--     end if;
+-- end;
