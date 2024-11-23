@@ -142,3 +142,186 @@ with recursive cte as
 select id, item_name, level 
 from cte
 order by 3;
+
+--- Q6 : IPL Matches --- 
+drop table teams;
+
+create table teams
+    (
+        team_code       varchar(10),
+        team_name       varchar(40)
+    );
+
+insert into teams values ('RCB', 'Royal Challengers Bangalore');
+insert into teams values ('MI', 'Mumbai Indians');
+insert into teams values ('CSK', 'Chennai Super Kings');
+insert into teams values ('DC', 'Delhi Capitals');
+insert into teams values ('RR', 'Rajasthan Royals');
+insert into teams values ('SRH', 'Sunrisers Hyderbad');
+insert into teams values ('PBKS', 'Punjab Kings');
+insert into teams values ('KKR', 'Kolkata Knight Riders');
+insert into teams values ('GT', 'Gujarat Titans');
+insert into teams values ('LSG', 'Lucknow Super Giants');
+
+select * from teams;
+
+-- Solution for Q1: Each team plays with every other team Just Once.
+
+with matches as
+	(select row_number() over(order by team_name) as id, t.*
+	from teams t)
+select team.team_name as team, opponent.team_name as opponent
+from matches team
+join matches opponent on team.id < opponent.id
+order by team;
+
+-- Solution for Q2: Each team plays with every other team twice.
+with matches as
+	(select row_number() over(order by team_name) as id, t.*
+	from teams t)
+select team.team_name as team, opponent.team_name as opponent
+from matches team
+join matches opponent on team.id <> opponent.id
+order by team;
+
+--- Q8: Find the hierarchy --- 
+
+drop table emp_details;
+
+create table emp_details
+    (
+        id           int PRIMARY KEY,
+        name         varchar(100),
+        manager_id   int,
+        salary       int,
+        designation  varchar(100)
+    );
+	
+insert into emp_details values (1,  'Shripadh', NULL, 10000, 'CEO');
+insert into emp_details values (2,  'Satya', 5, 1400, 'Software Engineer');
+insert into emp_details values (3,  'Jia', 5, 500, 'Data Analyst');
+insert into emp_details values (4,  'David', 5, 1800, 'Data Scientist');
+insert into emp_details values (5,  'Michael', 7, 3000, 'Manager');
+insert into emp_details values (6,  'Arvind', 7, 2400, 'Architect');
+insert into emp_details values (7,  'Asha', 1, 4200, 'CTO');
+insert into emp_details values (8,  'Maryam', 1, 3500, 'Manager');
+insert into emp_details values (9,  'Reshma', 8, 2000, 'Business Analyst');
+insert into emp_details values (10, 'Akshay', 8, 2500, 'Java Developer');
+
+select * from emp_details;
+
+-- Solution
+with recursive cte as
+	(select * from emp_details
+	where name = 'Asha'
+	union
+	select e.*
+	from cte
+	join emp_details e 
+	on e.manager_id = cte.id)
+select * from cte;
+
+--- Q9: Find difference in average sales --- 
+
+drop table sales_order_detail;
+
+create table sales_order_detail
+(
+    order_number        bigserial primary key,
+    quantity_ordered    int check (quantity_ordered > 0),
+    price_each          float,
+    sales               float,
+    order_date          date,
+    status              varchar(15),
+    qtr_id              int check (qtr_id between 1 and 4),
+    month_id            int check (month_id between 1 and 12),
+    year_id             int,
+    Product             varchar(20) ,
+    customer            varchar(20) ,
+    deal_size           varchar(10) check (deal_size in ('Small', 'Medium', 'Large'))
+);
+
+alter table sales_order_detail add constraint chk_ord_sts
+check (status in ('Cancelled', 'Disputed', 'In Process', 'On Hold', 'Resolved', 'Shipped'));
+
+select * from sales_order_detail;
+
+-- Solution
+with cte as 
+	(select year_id, month_id, to_char(order_date, 'MON') as mon, avg(sales) as avg_sales_per_mon
+	from sales_order_detail sod 
+	where year_id in (2003, 2004)
+	group by year_id, month_id, to_char(order_date, 'MON'))
+select year2k3.mon, round(abs(year2k4.avg_sales_per_mon - year2k3.avg_sales_per_mon)::decimal, 2)
+as sales_difference
+from cte year2k3
+join cte year2k4
+on year2k3.mon = year2k4.mon
+where year2k3.year_id = 2003
+and year2k4.year_id = 2004
+order by year2k3.month_id;
+
+--- Q10: Pizza Delivery Status --- 
+
+-- A pizza company is taking orders from customers, and each pizza ordered is added to their 
+-- database as a separate order. Each order has an associated status, "CREATED or SUBMITTED 
+-- or DELIVERED'. 	
+-- An order's Final_ Status is calculated based on status as follows:	
+-- 	1. When all orders for a customer have a status of DELIVERED, that customer's order has 
+-- 	a Final_Status of COMPLETED.
+-- 	2. If a customer has some orders that are not DELIVERED and some orders that are DELIVERED,
+-- 	the Final_ Status is IN PROGRESS.
+-- 	3. If all of a customer's orders are SUBMITTED, the Final_Status is AWAITING PROGRESS.
+-- 	4. Otherwise, the Final Status is AWAITING SUBMISSION.
+
+-- Write a query to report the customer_name and Final_Status of each customer's arder. Order the
+-- results by customer	name.	
+
+drop table cust_orders;
+
+create table cust_orders
+(
+cust_name   varchar(50),
+order_id    varchar(10),
+status      varchar(50)
+);
+
+insert into cust_orders values ('John', 'J1', 'DELIVERED');
+insert into cust_orders values ('John', 'J2', 'DELIVERED');
+insert into cust_orders values ('David', 'D1', 'SUBMITTED');
+insert into cust_orders values ('David', 'D2', 'DELIVERED');
+insert into cust_orders values ('David', 'D3', 'CREATED');
+insert into cust_orders values ('Smith', 'S1', 'SUBMITTED');
+insert into cust_orders values ('Krish', 'K1', 'CREATED');
+
+select * from cust_orders;
+
+-- Solution
+select distinct cust_name as customer, 'COMPLETED' as status
+from cust_orders co
+where co.status = 'DELIVERED'
+and not exists (select 1 from cust_orders co2
+				where co2.cust_name = co.cust_name
+				and co2.status in ('SUBMITTED', 'CREATED'))
+union
+select distinct cust_name as customer, 'IN PROGRESS' as status
+from cust_orders co
+where co.status = 'DELIVERED'
+and exists (select 1 from cust_orders co2
+				where co2.cust_name = co.cust_name
+				and co2.status in ('SUBMITTED', 'CREATED'))
+union
+select distinct cust_name as customer, 'AWAITING PROGRESS' as status
+from cust_orders co
+where co.status = 'SUBMITTED'
+and not exists (select 1 from cust_orders co2
+				where co2.cust_name = co.cust_name
+				and co2.status in ('DELIVERED'))
+union
+select distinct cust_name as customer, 'AWAITING SUBMISSION' as status
+from cust_orders co
+where co.status = 'CREATED'
+and not exists (select 1 from cust_orders co2
+				where co2.cust_name = co.cust_name
+				and co2.status in ('SUBMITTED', 'DELIVERED'));
+
