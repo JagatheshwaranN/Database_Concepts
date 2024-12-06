@@ -194,4 +194,30 @@ select * from ex_cars order by model, brand;
 alter table ex_cars drop column row_num;
 
 -- Solution 3: By creating a backup table
+
+create table ex_cars_bkp as
+select distinct * from ex_cars;
+
+select * from ex_cars_bkp;
+
+drop table ex_cars;
+
+alter table ex_cars_bkp rename to ex_cars;
+
+select * from ex_cars;
+
 -- Solution 4: By creating a backup table without dropping the original table
+
+create table ex_cars_bkp as
+select distinct * from ex_cars;
+
+select * from ex_cars_bkp;
+
+truncate table ex_cars;
+
+insert into ex_cars
+select * from ex_cars_bkp;
+
+drop table ex_cars_bkp;
+
+select * from ex_cars;
