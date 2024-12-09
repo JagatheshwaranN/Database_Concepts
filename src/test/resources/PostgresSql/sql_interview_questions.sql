@@ -159,12 +159,14 @@ from tree;
 
 -- Dataset PostgreSQL
 drop table files;
+
 create table files
 (
 id              int primary key,
 date_modified   date,
 file_name       varchar(50)
 );
+
 insert into files values (1	,   to_date('2021-06-03','yyyy-mm-dd'), 'thresholds.svg');
 insert into files values (2	,   to_date('2021-06-01','yyyy-mm-dd'), 'redrag.py');
 insert into files values (3	,   to_date('2021-06-03','yyyy-mm-dd'), 'counter.pdf');
@@ -235,3 +237,65 @@ where cnt = (select max(cnt) from cte c2
 where c2.date_modified = c1.date_modified)
 group by date_modified;
 
+-- Problem Statement 5
+
+-- Dataset
+create table emp_hierarchy
+(emp_id int,
+reporting_id int);
+
+insert into emp_hierarchy values (1, null);
+insert into emp_hierarchy values (2, 1);
+insert into emp_hierarchy values (3, 1);
+insert into emp_hierarchy values (4, 2);
+insert into emp_hierarchy values (5, 2);
+insert into emp_hierarchy values (6, 3);
+insert into emp_hierarchy values (7, 3);
+insert into emp_hierarchy values (8, 4);
+insert into emp_hierarchy values (9, 4);
+
+select * from emp_hierarchy;
+
+-- Find the hierarchy of employees
+
+-- For each employee, showcase all the employee's working under them (including themselves)
+-- Such that, when the child tree expands i.e. every new employee should be dynamically 
+-- assigned to their managers till the top level hierarchy.
+
+Recursive SQL syntax
+with recursive cte as
+	(base query 
+	union all
+	recursive part of the query
+	termination / exit condition)
+select *
+from cte;
+
+with recursive cte as 
+	(select emp_id, emp_id as employee_hierarchy
+	from emp_hierarchy
+	union all
+	select cte.emp_id, eh.emp_id as employee_hierarchy
+	from cte
+	join emp_hierarchy eh on cte.employee_hierarchy = eh.reporting_id)
+select * 
+from cte
+order by emp_id, employee_hierarchy;
+
+-- 1st Iteration
+select emp_id, emp_id as employee_hierarchy
+from emp_hierarchy where emp_id = 1;
+
+-- 2nd Iteration
+select cte.emp_id, eh.emp_id as employee_hierarchy
+	from (select emp_id, emp_id as employee_hierarchy
+			from emp_hierarchy where emp_id = 1) cte
+	join emp_hierarchy eh on cte.employee_hierarchy = eh.reporting_id;
+
+-- 3rd Iteration
+select cte.emp_id, eh.emp_id as employee_hierarchy
+	from (select cte.emp_id, eh.emp_id as employee_hierarchy
+			from (select emp_id, emp_id as employee_hierarchy
+					from emp_hierarchy where emp_id = 1) cte
+			join emp_hierarchy eh on cte.emp_id = eh.reporting_id)cte
+	join emp_hierarchy eh on cte.employee_hierarchy = eh.reporting_id;
