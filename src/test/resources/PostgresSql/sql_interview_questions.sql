@@ -299,3 +299,51 @@ select cte.emp_id, eh.emp_id as employee_hierarchy
 					from emp_hierarchy where emp_id = 1) cte
 			join emp_hierarchy eh on cte.emp_id = eh.reporting_id)cte
 	join emp_hierarchy eh on cte.employee_hierarchy = eh.reporting_id;
+
+
+-- Problem Statement 6
+-- Data set
+drop table arbitrary_values;
+
+CREATE TABLE arbitrary_values (
+    val VARCHAR[]
+);
+
+insert into arbitrary_values (val) values (Array['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10', 'a11', 'a12', 'a13', 'a14', 'a15', 'a16', 'a17', 'a18', 'a19', 'a20', 'a21']);
+
+select * from arbitrary_values;
+
+-- Given is a list of abritary values. They can either be comma separated values in a single
+-- row column or they could be values spread across multiple rows. Write an SQL Query to group
+-- these arbitrary values as per the expected output.
+
+-- Step by Step approach
+
+-- Convert the column level data to row level data
+select unnest(val) from arbitrary_values;
+
+-- Adding unique identifier with ordinality
+select x.*
+from arbitrary_values
+cross join unnest(val) with ordinality x(val, index);
+
+with recursive cte as
+	(select *, 1 as iterator, max(index) over() as max_index
+	from cte_values where index = 1
+	union
+	select cv.*, (iterator+1), max(cv.index) over() as max_index
+	from cte
+	join cte_values cv on cv.index between max_index+1 and max_index+1+iterator
+	),
+cte_values as
+	(select x.*
+	from arbitrary_values
+	cross join unnest(val) with ordinality x(val, index))
+select iterator as grp, string_agg(val, ' , ') as values 
+from cte
+group by iterator
+order by iterator;
+
+
+
+
