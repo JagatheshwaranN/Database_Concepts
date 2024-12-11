@@ -319,7 +319,7 @@ select * from arbitrary_values;
 
 -- Step by Step approach
 
--- Convert the column level data to row level data
+-- Convert the column level array data to row level text data
 select unnest(val) from arbitrary_values;
 
 -- Adding unique identifier with ordinality
@@ -344,6 +344,119 @@ from cte
 group by iterator
 order by iterator;
 
+-- Problem Statement 7
+-- Data set
+drop table weather;
 
+create table weather
+(
+id int,
+city varchar(50),
+temperature int,
+day date
+);
+
+delete from weather;
+
+insert into weather values
+(1, 'London', -1, to_date('2021-01-01','yyyy-mm-dd')),
+(2, 'London', -2, to_date('2021-01-02','yyyy-mm-dd')),
+(4, 'London', 1, to_date('2021-01-04','yyyy-mm-dd')),
+(5, 'London', -2, to_date('2021-01-05','yyyy-mm-dd')),
+(6, 'London', -5, to_date('2021-01-06','yyyy-mm-dd')),
+(8, 'London', 5, to_date('2021-01-08','yyyy-mm-dd')),
+(9, 'London', 7, to_date('2021-01-09','yyyy-mm-dd')),
+(10, 'London', -4, to_date('2021-01-10','yyyy-mm-dd')),
+(11, 'London', -2, to_date('2021-01-11','yyyy-mm-dd')),
+(12, 'London', -4, to_date('2021-01-12','yyyy-mm-dd'));
+
+
+select * from weather;
+
+-- Type 1: SQL Query to fetch "N" consecutive records when temperature is below 0.
+
+-- Fetch the temperature below 0.
+select * from weather where temperature < 0;
+
+-- Add a unique row number to the data
+select *, row_number() over(order by id) as rn
+from weather
+where temperature < 0;
+
+-- Logic to group the data
+select *, row_number() over(order by id) as rn,
+(id - row_number() over(order by id)) as difference
+from weather
+where temperature < 0;
+
+-- Final query using with clause
+with t1 as
+		(select *, row_number() over(order by id) as rn,
+		id - (row_number() over(order by id)) as difference
+		from weather
+		where temperature < 0),
+	t2 as
+		(select *, count(*) over(partition by difference) as no_of_records
+		from t1)
+select id, city, temperature, day
+from t2
+where no_of_records = 3;
+
+-- Data set
+create view vw_weather as select city, temperature from weather;
+
+select * from vw_weather;
+
+-- Type 2: SQL Query to fetch "N" consecutive records when temperature is below 0 and also
+-- table doesn't have id column.
+
+with w as
+		(select *, row_number() over() as id 
+		from vw_weather),
+	t1 as
+		(select *, row_number() over(order by id) as rn,
+		id - (row_number() over(order by id)) as difference
+		from w
+		where temperature < 0),
+	t2 as
+		(select *, count(*) over(partition by difference) as no_of_records
+		from t1)
+select id, city, temperature
+from t2
+where no_of_records = 3;
+
+-- Data set
+create table orders 
+(
+	order_id varchar primary key,
+	order_date date
+);
+
+insert into orders values ('ORD1001', to_date('2023-01-01', 'yyyy-mm-dd'));
+insert into orders values ('ORD1002', to_date('2023-02-01', 'yyyy-mm-dd'));
+insert into orders values ('ORD1003', to_date('2023-02-02', 'yyyy-mm-dd'));
+insert into orders values ('ORD1004', to_date('2023-02-03', 'yyyy-mm-dd'));
+insert into orders values ('ORD1005', to_date('2023-03-01', 'yyyy-mm-dd'));
+insert into orders values ('ORD1006', to_date('2023-06-01', 'yyyy-mm-dd'));
+insert into orders values ('ORD1007', to_date('2023-12-25', 'yyyy-mm-dd'));
+insert into orders values ('ORD1008', to_date('2023-12-26', 'yyyy-mm-dd'));
+
+select * from orders;
+
+-- Type 3: Fetch the records from table where there are orders for 3 consecutive days
+
+select *, row_number() over(order by order_id) as rn 
+from orders;
+
+with t1 as 
+		(select *, row_number() over(order by order_id) as rn , 
+		order_date - cast (row_number() over(order by order_id)as int) as difference
+		from orders),
+	 t2 as
+	 	(select *, count(*) over(partition by difference) as no_of_records
+		 from t1)
+select order_id, order_date
+from t2
+where no_of_records = 2;
 
 
