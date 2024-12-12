@@ -395,7 +395,7 @@ with t1 as
 		id - (row_number() over(order by id)) as difference
 		from weather
 		where temperature < 0),
-	t2 as
+	 t2 as
 		(select *, count(*) over(partition by difference) as no_of_records
 		from t1)
 select id, city, temperature, day
@@ -457,6 +457,118 @@ with t1 as
 		 from t1)
 select order_id, order_date
 from t2
-where no_of_records = 2;
+where no_of_records = 3;
+
+-- Problem Statement 8
+
+-- Data set
+drop table if exists batch;
+drop table if exists orders;
+
+create table batch (batch_id varchar(10), quantity integer);
+create table bat_orders (order_number varchar(10), quantity integer);
 
 
+insert into batch values ('B1', 5);
+insert into batch values ('B2', 12);
+insert into batch values ('B3', 8);
+
+insert into bat_orders values ('O1', 2);
+insert into bat_orders values ('O2', 8);
+insert into bat_orders values ('O3', 2);
+insert into bat_orders values ('O4', 5);
+insert into bat_orders values ('O5', 9);
+insert into bat_orders values ('O6', 5);
+
+select * from batch;
+select * from bat_orders;
+
+-- Imagine a Warehouse where items are stored in different batches as indicated in the Batch table. 
+-- Customers can purchase multiple items in a single order as indicated in Orders table. Write an 
+-- SQL query to determine items for each order are taken from which Batch. Assume that items are 
+-- sequentially taken from each Batch starting from the first batch.
+
+-- The first thing to get the result for the above query, the Batch and Orders table has expanded.
+
+-- Expanding the table values
+with recursive batch_split as 
+	(select batch_id, 1 as quantity from batch
+	union all
+	select b.batch_id, (cte.quantity+1) as quantity
+	from batch_split cte
+	join batch b
+	on b.batch_id = cte.batch_id
+	and b.quantity > cte.quantity)
+select batch_id, 1 as quantity 
+from batch_split;
+
+with recursive orders_split as 
+	(select order_number, 1 as quantity from bat_orders
+	union all
+	select b.order_number, (cte.quantity+1) as quantity
+	from orders_split cte
+	join bat_orders b
+	on b.order_number = cte.order_number
+	and b.quantity > cte.quantity)
+select order_number, 1 as quantity 
+from orders_split
+
+-- Adding the row numbers
+select *, row_number() over(order by batch_id) as rn
+from 
+(with recursive batch_split as 
+	(select batch_id, 1 as quantity from batch
+	union all
+	select b.batch_id, (cte.quantity+1) as quantity
+	from batch_split cte
+	join batch b
+	on b.batch_id = cte.batch_id
+	and b.quantity > cte.quantity)
+select batch_id, 1 as quantity 
+from batch_split) x;
+
+select *, row_number() over(order by order_number) as rn
+from 
+(with recursive orders_split as 
+	(select order_number, 1 as quantity from bat_orders
+	union all
+	select b.order_number, (cte.quantity+1) as quantity
+	from orders_split cte
+	join bat_orders b
+	on b.order_number = cte.order_number
+	and b.quantity > cte.quantity)
+select order_number, 1 as quantity 
+from orders_split) x;
+
+-- Final Query to join the tables
+with batch_cte as 
+		(select *, row_number() over(order by batch_id) as rn
+		from 
+		(with recursive batch_split as 
+			(select batch_id, 1 as quantity from batch
+			union all
+			select b.batch_id, (cte.quantity+1) as quantity
+			from batch_split cte
+			join batch b
+			on b.batch_id = cte.batch_id
+			and b.quantity > cte.quantity)
+		select batch_id, 1 as quantity 
+		from batch_split) x),
+	order_cte as
+		(select *, row_number() over(order by order_number) as rn
+		from 
+		(with recursive orders_split as 
+			(select order_number, 1 as quantity from bat_orders
+			union all
+			select b.order_number, (cte.quantity+1) as quantity
+			from orders_split cte
+			join bat_orders b
+			on b.order_number = cte.order_number
+			and b.quantity > cte.quantity)
+		select order_number, 1 as quantity 
+		from orders_split) x)
+select o.order_number, b.batch_id, sum(b.quantity) as quantity
+from order_cte o
+left join batch_cte b on b.rn = o.rn
+group by o.order_number, b.batch_id
+order by o.order_number, b.batch_id;
