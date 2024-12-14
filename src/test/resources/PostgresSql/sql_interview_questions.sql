@@ -675,4 +675,137 @@ relatives from
 	union
 	select * from no_relatives) x;
 
+-- Problem Statement 10
+
+-- Julia conducted a  days of learning SQL contest. The start date of the contest was March 01, 2016
+-- and the end date was March 15, 2016. Write a query to print total number of unique hackers who made
+-- at least  submission each day (starting on the first day of the contest), and find the hacker_id 
+-- and name of the hacker who made maximum number of submissions each day. If more than one such hacker
+-- has a maximum number of submissions, print the lowest hacker_id. The query should print this 
+-- information for each day of the contest, sorted by the date.
+
+-- Data set
+
+drop table hackers;
+drop table submissions;
+
+create table hackers (hacker_id int, name varchar(40));
+create table submissions (submission_date date, submission_id int, hacker_id int, score int);
+
+
+insert into hackers values (15758, 'Rose');
+insert into hackers values (20703, 'Angela');
+insert into hackers values (36396, 'Frank');
+insert into hackers values (38289, 'Patrick');
+insert into hackers values (44065, 'Lisa');
+insert into hackers values (53473, 'Kimberly');
+insert into hackers values (62529, 'Bonnie');
+insert into hackers values (79722, 'Michael');
+
+truncate table submissions 
+
+insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'),  8494,   20703,	 0	);
+insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'), 22403, 	53473,	 15	);
+insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'), 23965, 	79722,	 60	);
+insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'), 30173, 	36396,	 70	);
+insert into submissions values (to_date('2016-03-02', 'yyyy-MM-dd'), 34928, 	20703,	 0	);
+insert into submissions values (to_date('2016-03-02', 'yyyy-MM-dd'), 38740, 	15758,	 60	);
+insert into submissions values (to_date('2016-03-02', 'yyyy-MM-dd'), 42769, 	79722,	 25	);
+insert into submissions values (to_date('2016-03-02', 'yyyy-MM-dd'), 44364, 	79722,	 60	);
+insert into submissions values (to_date('2016-03-03', 'yyyy-MM-dd'), 45440, 	20703,	 0	);
+insert into submissions values (to_date('2016-03-03', 'yyyy-MM-dd'), 49050, 	36396,	 70	);
+insert into submissions values (to_date('2016-03-03', 'yyyy-MM-dd'), 50273, 	79722,	 5	);
+insert into submissions values (to_date('2016-03-04', 'yyyy-MM-dd'), 50344, 	20703,	 0	);
+insert into submissions values (to_date('2016-03-04', 'yyyy-MM-dd'), 51360, 	44065,	 90	);
+insert into submissions values (to_date('2016-03-04', 'yyyy-MM-dd'), 54404, 	53473,	 65	);
+insert into submissions values (to_date('2016-03-04', 'yyyy-MM-dd'), 61533, 	79722,	 45	);
+insert into submissions values (to_date('2016-03-05', 'yyyy-MM-dd'), 72852, 	20703,	 0	);
+insert into submissions values (to_date('2016-03-05', 'yyyy-MM-dd'), 74546, 	38289,	 0	);
+insert into submissions values (to_date('2016-03-05', 'yyyy-MM-dd'), 76487, 	62529,	 0	);
+insert into submissions values (to_date('2016-03-05', 'yyyy-MM-dd'), 82439, 	36396,	 10	);
+insert into submissions values (to_date('2016-03-05', 'yyyy-MM-dd'), 90006, 	36396,	 40	);
+insert into submissions values (to_date('2016-03-06', 'yyyy-MM-dd'), 90404, 	20703,	 0	);
+
+select * from hackers;
+select * from submissions;
+
+-- base query
+select distinct submission_date, hacker_id
+from submissions
+where submission_date = (select min(submission_date) from submissions);
+
+-- recursive query
+
+--  print total number of unique hackers who made at least  submission each day 
+-- (starting on the first day of the contest),
+with recursive cte as
+	(select distinct submission_date, hacker_id
+	from submissions
+	where submission_date = (select min(submission_date) from submissions)
+	union
+	select s.submission_date, s.hacker_id 
+	from submissions s
+	join cte on cte.hacker_id = s.hacker_id
+	where s.submission_date = (select min(submission_date) from submissions
+								where submission_date > cte.submission_date)),
+	unique_hackers as							
+		(select submission_date, count(1) as no_of_hackers 
+		from cte
+		group by submission_date);
+
+-- find the hacker_id and name of the hacker who made maximum number of submissions each day
+-- If more than one such hacker has a maximum number of submissions, print the lowest hacker_id.
+with submission_count as
+	(select submission_date, hacker_id, count(1) as no_of_submission
+	from submissions
+	group by submission_date, hacker_id
+	order by 1),
+	max_submission as 
+		(select submission_date, max(no_of_submission) as max_submission
+		from submission_count
+		group by submission_date)
+select c.submission_date, min(c.hacker_id) as hacker_id
+from max_submission m
+join submission_count c
+on c.submission_date = m.submission_date
+and c.no_of_submission = m.max_submission
+group by c.submission_date;
+
+-- final query
+with recursive cte as
+	(select distinct submission_date, hacker_id
+	from submissions
+	where submission_date = (select min(submission_date) from submissions)
+	union
+	select s.submission_date, s.hacker_id 
+	from submissions s
+	join cte on cte.hacker_id = s.hacker_id
+	where s.submission_date = (select min(submission_date) from submissions
+								where submission_date > cte.submission_date)),
+	unique_hackers as							
+		(select submission_date, count(1) as no_of_hackers 
+		from cte
+		group by submission_date),
+	submission_count as
+		(select submission_date, hacker_id, count(1) as no_of_submission
+		from submissions
+		group by submission_date, hacker_id
+		order by 1),
+	max_submission as 
+		(select submission_date, max(no_of_submission) as max_submission
+		from submission_count
+		group by submission_date),
+	final_hackers as
+		(select c.submission_date, min(c.hacker_id) as hacker_id
+		from max_submission m
+		join submission_count c
+		on c.submission_date = m.submission_date
+		and c.no_of_submission = m.max_submission
+		group by c.submission_date)
+select uh.submission_date, uh.no_of_hackers, fh.hacker_id, hk.name as hacker_name
+from unique_hackers uh
+join final_hackers fh
+on fh.submission_date = uh.submission_date
+join hackers hk on hk.hacker_id = fh.hacker_id
+order by 1;
 
