@@ -677,9 +677,9 @@ relatives from
 
 -- Problem Statement 10
 
--- Julia conducted a  days of learning SQL contest. The start date of the contest was March 01, 2016
+-- Julia conducted a 15 days of learning SQL contest. The start date of the contest was March 01, 2016
 -- and the end date was March 15, 2016. Write a query to print total number of unique hackers who made
--- at least  submission each day (starting on the first day of the contest), and find the hacker_id 
+-- at least 1 submission each day (starting on the first day of the contest), and find the hacker_id 
 -- and name of the hacker who made maximum number of submissions each day. If more than one such hacker
 -- has a maximum number of submissions, print the lowest hacker_id. The query should print this 
 -- information for each day of the contest, sorted by the date.
@@ -701,8 +701,6 @@ insert into hackers values (44065, 'Lisa');
 insert into hackers values (53473, 'Kimberly');
 insert into hackers values (62529, 'Bonnie');
 insert into hackers values (79722, 'Michael');
-
-truncate table submissions 
 
 insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'),  8494,   20703,	 0	);
 insert into submissions values (to_date('2016-03-01', 'yyyy-MM-dd'), 22403, 	53473,	 15	);
@@ -736,7 +734,7 @@ where submission_date = (select min(submission_date) from submissions);
 
 -- recursive query
 
---  print total number of unique hackers who made at least  submission each day 
+--  print total number of unique hackers who made at least 1 submission each day 
 -- (starting on the first day of the contest),
 with recursive cte as
 	(select distinct submission_date, hacker_id
@@ -809,3 +807,155 @@ on fh.submission_date = uh.submission_date
 join hackers hk on hk.hacker_id = fh.hacker_id
 order by 1;
 
+-- Problem Statement 11 [FAANG]
+
+-- We want to generate an inventory age report which would show the distribution of remaining inventory
+-- across the length of time the inventory has been sitting at the warehouse. We are trying to classify
+-- the inventory on hand across the below 4 buckets to denote the time the inventory has been lying the 
+-- warehouse.
+
+-- 0-90 days old 
+-- 91-180 days old
+-- 181-270 days old
+-- 271 – 365 days old
+
+-- For example, the warehouse received 100 units yesterday and shipped 30 units today, then there are 70 
+-- units which are a day old.
+
+-- The warehouses use FIFO (first in first out) approach to manage inventory, i.e., the inventory that comes
+-- first will be sent out first. 
+ 
+-- For example, on 20th May 2019, 250 units were inbounded into the FC. On 22nd May 2019, 8 units were shipped 
+-- out (outbound) from the FC, reducing inventory on hand to 242 units. On 31st December, 120 units were further
+-- inbounded into the FC increasing the inventory on hand from 242 to 362.On 29th January 2020, 27 units were 
+-- shipped out reducing the inventory on hand to 335 units.
+
+-- On 29th January, of the 335 units on hands, 120 units were 0-90 days old (29 days old) and 215 units were 
+-- 181-270 days old (254 days old).
+
+-- Columns:
+-- ID of the log entry
+-- OnHandQuantity: Quantity in warehouse after an event
+-- OnHandQuantityDelta: Change in on-hand quantity due to an event
+-- event_type: Inbound – inventory being brought into the warehouse; Outbound – inventory being sent out of 
+-- warehouse
+-- event_datetime: date- time of event
+-- The data is sorted with latest entry at top.
+
+-- Data set
+drop table warehouse;
+
+create table warehouse
+(
+	Id						varchar(10),
+	OnHandQuantity			int,
+	OnHandQuantityDelta		int,
+	event_type				varchar(10),
+	event_datetime			timestamp
+);
+
+insert into warehouse values
+('SH0013', 278,   99 ,   'OutBound', '2020-05-25 0:25'), 
+('SH0012', 377,   31 ,   'InBound',  '2020-05-24 22:00'),
+('SH0011', 346,   1  ,   'OutBound', '2020-05-24 15:01'),
+('SH0010', 346,   1  ,   'OutBound', '2020-05-23 5:00'),
+('SH009',  348,   102,   'InBound',  '2020-04-25 18:00'),
+('SH008',  246,   43 ,   'InBound',  '2020-04-25 2:00'),
+('SH007',  203,   2  ,   'OutBound', '2020-02-25 9:00'),
+('SH006',  205,   129,   'OutBound', '2020-02-18 7:00'),
+('SH005',  334,   1  ,   'OutBound', '2020-02-18 8:00'),
+('SH004',  335,   27 ,   'OutBound', '2020-01-29 5:00'),
+('SH003',  362,   120,   'InBound',  '2019-12-31 2:00'),
+('SH002',  242,   8  ,   'OutBound', '2019-05-22 0:50'),
+('SH001',  250,   250,   'InBound',  '2019-05-20 0:45');
+
+select * from warehouse order by event_datetime desc;
+
+-- Get the Day 1 data
+with WH as 
+		(select * from warehouse order by event_datetime desc),
+	 days as
+	 	(select *
+		 from WH limit 1)
+select * from days;
+
+-- Get the 90 Days / 180 Days / 270 Days / 365 Days date
+with WH as 
+		(select * from warehouse order by event_datetime desc),
+	 days as
+	 	(select onhandquantity, event_datetime,
+		 (event_datetime - interval '90 DAY') as day90,
+		 (event_datetime - interval '180 DAY') as day180,
+		 (event_datetime - interval '270 DAY') as day270,
+		 (event_datetime - interval '365 DAY') as day365
+		 from WH limit 1)
+select * from days;
+
+-- Final Query
+with WH as 
+		(select * from warehouse order by event_datetime desc),
+	 days as
+	 	(select onhandquantity, event_datetime,
+		 (event_datetime - interval '90 DAY') as day90,
+		 (event_datetime - interval '180 DAY') as day180,
+		 (event_datetime - interval '270 DAY') as day270,
+		 (event_datetime - interval '365 DAY') as day365
+		 from WH limit 1),
+	 inv_90_days as 
+	 	(select coalesce(sum(onhandquantitydelta), 0) as DaysOld_90
+		 from WH cross join days d
+		 where event_type = 'InBound'
+		 and WH.event_datetime >= d.day90),
+	 inv_90_days_final as
+	 	(select case when DaysOld_90 > d.onhandquantity then d.onhandquantity
+		 			 else DaysOld_90
+				end DaysOld_90
+		 from inv_90_days
+		 cross join days d),
+	 inv_180_days as 
+	 	(select coalesce(sum(onhandquantitydelta), 0) as DaysOld_180
+		 from WH cross join days d
+		 where event_type = 'InBound'
+		 and WH.event_datetime between d.day180 and d.day90),
+	 inv_180_days_final as
+	 	(select case when DaysOld_180 > (d.onhandquantity - DaysOld_90) then (d.onhandquantity - DaysOld_90)
+		 			 else DaysOld_180
+				end DaysOld_180
+		 from inv_180_days
+		 cross join days d
+		 cross join inv_90_days_final),
+	 inv_270_days as 
+	 	(select coalesce(sum(onhandquantitydelta), 0) as DaysOld_270
+		 from WH cross join days d
+		 where event_type = 'InBound'
+		 and WH.event_datetime between d.day270 and d.day180),
+	 inv_270_days_final as
+	 	(select case when DaysOld_270 > (d.onhandquantity - (DaysOld_90 + DaysOld_180)) then (d.onhandquantity - (DaysOld_90 + DaysOld_180))
+		 			 else DaysOld_270
+				end DaysOld_270
+		 from inv_270_days
+		 cross join days d
+		 cross join inv_90_days_final
+		 cross join inv_180_days_final),
+	 inv_365_days as 
+	 	(select coalesce(sum(onhandquantitydelta), 0) as DaysOld_365
+		 from WH cross join days d
+		 where event_type = 'InBound'
+		 and WH.event_datetime between d.day365 and d.day270),
+	 inv_365_days_final as
+	 	(select case when DaysOld_365 > (d.onhandquantity - (DaysOld_90 + DaysOld_180 + DaysOld_270)) then (d.onhandquantity - (DaysOld_90 + DaysOld_180 + DaysOld_270))
+		 			 else DaysOld_365
+				end DaysOld_365
+		 from inv_365_days
+		 cross join days d
+		 cross join inv_90_days_final
+		 cross join inv_180_days_final
+		 cross join inv_270_days_final)
+select DaysOld_90 as "0-90 days old" ,
+DaysOld_180 as "91-180 days old",
+DaysOld_270 as "181-270 days old",
+DaysOld_365 as "270-365 days old"
+from inv_90_days_final
+cross join inv_180_days_final
+cross join inv_270_days_final
+cross join inv_365_days_final;
